@@ -1,0 +1,71 @@
+body {
+    background-color: #5D4C46;
+}
+.gamecontainer {
+    text-align:center;
+}
+
+table {
+    max-width: 100%
+    margin-top: 2em;
+    border : 1px solid grey;
+    background-color: #7B8D8E;
+} 
+
+table.center {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+td {
+    width:1.5em;
+    height:1.5em;
+    font-size:2em;
+    color: black;
+    background-color: #F2EDD8;
+    text-align:center;
+    border-radius:0.2em;
+    transition: background-color 0.15s;    
+}
+
+.player {
+    background-color: #44B3C2;
+    color: #F2EDD8;
+}
+
+.obstacle {
+    background-color: #5D4C46;
+    color: #F1A94E;
+    animation-name: scale;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;    
+}
+
+.enemy
+{
+    background-color: #F1A94E;
+    color: #E45641;
+}
+
+.dead {
+    background-color: #E45641;
+    animation-name: deathAnimation;
+    animation-duration: 3s;
+    animation-iteration-count: 1;
+    animation-direction: normal;    
+}
+
+@keyframes deathAnimation {
+    0%   {
+            transform: rotate(0deg) scale(1, 1);
+          }
+    100% {
+            transform: rotate(360deg) scale(0, 0);
+         }
+}
+
+@keyframes scale {
+    0%   {transform: scale(1, 1);}
+    100% {transform: scale(0.5, 0.5);}
+}
