@@ -29,7 +29,7 @@ function documentModMachine() {
             //console.log(i);
             for (j = 0; j < defaults.xLimit +1; j += 1) {
                 snippet = snippet + "<td class=\"x" + j + " y" + i + "\"></td>";
-                console.log(i, j);
+                //console.log(i, j);
             }
             snippet = snippet + "</tr>";
         }
@@ -100,7 +100,7 @@ function flyingswords(helper, defaults) {
     var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
         var cell = document.getElementsByClassName(currentPos);
-        console.log("This cell is checked for collision: " + cell[0].innerHTML);
+        //console.log("This cell is checked for collision: " + cell[0].innerHTML);
         if (!cell[0].innerText) {
             return 0;
         } else {
@@ -118,13 +118,13 @@ function flyingswords(helper, defaults) {
             helper.removeClassForCell("player", player.position);
             player.position[0] = player.position[0] + xDir;
             player.position[1] = player.position[1] + yDir;
-            console.log("The player position after move: " + player.position, position);
+            //console.log("The player position after move: " + player.position, position);
             updateStage();
             //console.log(position);
         };
 
         var plot = function () {
-            console.log("Plot sees player at: " + player.position);
+            //console.log("Plot sees player at: " + player.position);
             // Plot player if new positions is empty
             var currentPos = "x" + player.position[0] + " y" + player.position[1];
             //console.log(currentPos);
@@ -182,11 +182,11 @@ function flyingswords(helper, defaults) {
         var x = helper.randomIntFromInterval(0, xLimit);
         var y = helper.randomIntFromInterval(0, yLimit);
         var coordinates = [x, y];
-        if (spec.skipCollisionCheck == true) {
+        if (spec.skipCollisionCheck === true) {
             return coordinates
         } else {
             while (checkCollision(coordinates)) {
-                coordinates = genCoordinates();
+                coordinates = genCoordinates({skipCollisionCheck: false});
             }
             return coordinates;
         }
@@ -199,7 +199,7 @@ function flyingswords(helper, defaults) {
         var cell = [];
         var stopIndex = defaults.numberOfObstacles;
         for (i = 0; i < stopIndex; i += 1) {
-            coordinates = generateCoordinates({skipCollisionCheck: true});
+            coordinates = generateCoordinates({skipCollisionCheck: false});
             pos = "x" + coordinates[0] + " y" + coordinates[1];
             cell = document.getElementsByClassName(pos);
             cell[0].innerText = "X";
@@ -220,12 +220,12 @@ function flyingswords(helper, defaults) {
     };
     var init = function () {
         helper.createBoard();
-        
         player.plot();
         addEventListener("keydown", document, handleKeyboardEvent);
         var i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
+            enemies[i].respawn();
             enemies[i].plot();
         }
         placeObstacles(); 
@@ -258,19 +258,19 @@ function flyingswords(helper, defaults) {
     for (i = 0; i < stopindex; i += 1 ) {
         enemies.push(
             (function () {
-                var alive = true;
-                var enemyPosition = generateCoordinates({skipCollisionCheck: true});
+                var alive = false;
+                var enemyPosition = [];
 
                 var move = function () {
                     if (alive) {
-                    console.log("Enemy position before move: " + enemyPosition);
+                    //console.log("Enemy position before move: " + enemyPosition);
                     helper.clearCell(enemyPosition);
                     helper.removeClassForCell("enemy", enemyPosition);
                     var directionX = calculateDirection(player.position[0], enemyPosition[0]);
                     var directionY = calculateDirection(player.position[1], enemyPosition[1]);
                     enemyPosition[0] = enemyPosition[0] + directionX;
                     enemyPosition[1] = enemyPosition[1] + directionY;
-                    console.log("Enemy position after move function: " + enemyPosition);
+                    //console.log("Enemy position after move function: " + enemyPosition);
                     }
                 };
 
