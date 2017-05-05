@@ -171,6 +171,8 @@ function flyingswords(helper, defaults) {
             var stop = enemies.length;
             for (i = 0; i < stop; i += 1) {
                 enemies[i].move();
+            }
+            for (i = 0; i < stop; i += 1) {
                 enemies[i].plot();
             }
         }
@@ -204,8 +206,20 @@ function flyingswords(helper, defaults) {
             cell = document.getElementsByClassName(pos);
             cell[0].innerText = "X";
             helper.addClassForCell("obstacle", coordinates);
+            
+            // Code for Chrome, Safari and Opera
+            cell[0].addEventListener("webkitAnimationEnd", resetObstacle);
+            // Standard syntax
+            cell[0].addEventListener("animationend", resetObstacle);
         }
     };
+    
+    var resetObstacle = function () {
+        this.innerHTML = "X";
+        this.classList.remove("enemy");
+        this.classList.remove("dead");
+        this.classList.add("obstacle");
+    }
 
     /**
     * old IE: attachEvent
@@ -303,9 +317,9 @@ function flyingswords(helper, defaults) {
                         } else if (cell[0].innerText === "X"){
                             cell[0].innerText += "I";
                             alive = false;
-                            cell[0].classList.remove("player");
+                            //cell[0].classList.remove("player");
                             cell[0].classList.remove("obstacle");
-                            cell[0].classList.remove("enemy");
+                            //cell[0].classList.remove("enemy");
                             cell[0].classList.add("dead");
                             //player.alive = false;
                         } else if (cell[0].innerText === "O") {
@@ -327,7 +341,6 @@ function flyingswords(helper, defaults) {
                             cell[0].classList.remove("obstacle");
                             cell[0].classList.remove("enemy");
                             cell[0].classList.add("dead");
-
                         }
                     }
                 };
