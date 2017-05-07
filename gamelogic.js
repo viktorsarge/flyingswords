@@ -5,14 +5,15 @@
 //
 
 var defaults = (function() {
-    var playerPos = [1, 1];
+    var xLimit = 19;
+    var yLimit = 9;
+    var playerPos = [Math.floor(xLimit/2), Math.floor(yLimit/2)]
     return {
+        xLimit: xLimit,
+        yLimit: yLimit,
         playerPos: playerPos,
-        enemyPos: [9,4],
-        xLimit: 19,
-        yLimit: 9,
         numberOfObstacles: 10,
-        numberOfEnemies: 5
+        numberOfEnemies: 4
     };
 }());
 
@@ -91,9 +92,9 @@ function documentModMachine() {
     };
 }
 
-//
-//  The game object belopw
-//
+//  ------------------------------------------------------------------------------ //
+//  The game object below                                                          //
+//  ------------------------------------------------------------------------------ //
 
 function flyingswords(helper, defaults) {
     // Keycode names for controls
@@ -157,7 +158,7 @@ function flyingswords(helper, defaults) {
         };
 
         var respawn = function () {
-            player.position = [1, 1];
+            player.position = [Math.floor(defaults.xLimit/2), Math.floor(defaults.yLimit/2)];
         };
 
         return {
@@ -173,7 +174,7 @@ function flyingswords(helper, defaults) {
         setTimeout(function() {
             enemies[i].move();
             enemies[i].plot();
-        }, 300 * i);
+        }, 100 * i);
         console.log("Delays");
     }
 
@@ -294,6 +295,21 @@ function flyingswords(helper, defaults) {
             (function () {
                 var alive = false;
                 var enemyPosition = [];
+                switch (i) {
+                    case 0:
+                        enemyPosition = [0, 0];
+                        break;
+                    case 1:
+                        enemyPosition = [0, defaults.yLimit];
+                        break;
+                    case 2:
+                        enemyPosition = [defaults.xLimit, defaults.yLimit];
+                        break;
+                    case 3:
+                        enemyPosition = [defaults.xLimit, 0];
+                        break;
+                }
+                console.log(enemyPosition);
 
                 var move = function () {
                     if (alive) {
@@ -322,7 +338,7 @@ function flyingswords(helper, defaults) {
                 };
 
                 var respawn = function () {
-                    enemyPosition = generateCoordinates({skipCollisionCheck: false});
+                    //enemyPosition = generateCoordinates({skipCollisionCheck: false});
                     alive = true;
                 };
 
