@@ -50,6 +50,13 @@ function documentModMachine() {
         var cell = document.getElementsByClassName(currentPos);
         cell[0].classList.remove(className);
     };
+    
+    var innerHTMLofPos = function (xy) {
+        var currentPos = "x" + xy[0] + " y" + xy[1];
+        console.log(xy, currentPos);
+        var cell = document.getElementsByClassName(currentPos);
+        return cell[0].innerHTML
+    };
 
     var clearAllCells = function () {
         var allCells = document.getElementsByTagName("td");
@@ -74,6 +81,7 @@ function documentModMachine() {
     };
 
     return {
+        innerHTMLofPos: innerHTMLofPos,
         createBoard: createBoard,
         addClassForCell: addClassForCell,
         clearCell: clearCell,
@@ -160,6 +168,14 @@ function flyingswords(helper, defaults) {
             respawn: respawn
         };
     }());
+    
+    function enemyPlotDelay(i) {
+        setTimeout(function() {
+            enemies[i].move();
+            enemies[i].plot();
+        }, 300 * i);
+        console.log("Delays");
+    }
 
     var updateStage = function () {
         if (checkCollision(player.position)) {
@@ -169,11 +185,15 @@ function flyingswords(helper, defaults) {
             player.plot();
             var i = 0;
             var stop = enemies.length;
-            for (i = 0; i < stop; i += 1) {
+            /*for (i = 0; i < stop; i += 1) {
                 enemies[i].move();
-            }
+            } */
             for (i = 0; i < stop; i += 1) {
-                enemies[i].plot();
+                console.log("ENEMY POS", + enemies[i].enemyPosition);
+                /*if (helper.innerHTMLofPos(enemies[i].enemyPosition).length > 1) {
+                    enemies[i].alive = false;
+                }*/
+                enemyPlotDelay(i);
             }
         }
     };
