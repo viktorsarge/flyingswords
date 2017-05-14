@@ -275,7 +275,7 @@ function flyingswords(helper, defaults) {
             coordinates = generateCoordinates({skipCollisionCheck: false});
             pos = "x" + coordinates[0] + " y" + coordinates[1];
             cell = document.getElementsByClassName(pos);
-            cell[0].innerText = "X";
+            cell[0].innerHTML = "X";
             helper.addClassForCell("obstacle", coordinates);
             
             // Code for Chrome, Safari and Opera
@@ -361,6 +361,7 @@ function flyingswords(helper, defaults) {
         };
 
         var respawn = function () {
+            enemyPosition = putBabyInACorner();
             alive = true;
         };
         
@@ -374,8 +375,11 @@ function flyingswords(helper, defaults) {
                 console.log(enemyPosition);
                 var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
                 var cell = document.getElementsByClassName(currentPos);
-                cell[0].innerText += "I";
+                cell[0].innerHTML += "I";
                 cell[0].classList.add("enemy");
+            } else {
+                respawn();
+                plot();
             }
         };
         
