@@ -1,13 +1,13 @@
 "use strict";
 
-//
-// Some helper functions wrapped in an object
-//
+// -------------------------------------------------------- //
+// Default values to be used in the program                 //
+// -------------------------------------------------------- //
 
 var defaults = (function() {
     var xLimit = 19;
     var yLimit = 9;
-    var playerPos = [Math.floor(xLimit/2), Math.floor(yLimit/2)]
+    var playerPos = [Math.floor(xLimit/2), Math.floor(yLimit/2)];
     return {
         xLimit: xLimit,
         yLimit: yLimit,
@@ -16,6 +16,10 @@ var defaults = (function() {
         numberOfEnemies: 4
     };
 }());
+
+// -------------------------------------------------------- //
+// Some helper functions wrapped in an object               //
+// -------------------------------------------------------- //
 
 function documentModMachine() {
 
@@ -38,7 +42,7 @@ function documentModMachine() {
         //console.log(container);
         container.innerHTML = snippet;
         return;
-    }
+    };
 
     var clearCell = function (element) {
         var currentPos = "x" + element[0] + " y" + element[1];
@@ -51,12 +55,12 @@ function documentModMachine() {
         var cell = document.getElementsByClassName(currentPos);
         cell[0].classList.remove(className);
     };
-    
+
     var innerHTMLofPos = function (xy) {
         var currentPos = "x" + xy[0] + " y" + xy[1];
         console.log(xy, currentPos);
         var cell = document.getElementsByClassName(currentPos);
-        return cell[0].innerHTML
+        return cell[0].innerHTML;
     };
 
     var clearAllCells = function () {
@@ -105,15 +109,63 @@ function flyingswords(helper, defaults) {
         DOWN: 40,
         SPACE: 32
     };
+    
+    
+    var putBabyInACorner = (function () {
+        var corner = 0;
+        var coords = [];
+        return function () {
+            corner += 1;
+            if (corner === 4) {
+                corner = 0;
+            }
+            switch (corner) {
+                case 0:
+                    coords = [0, 0];
+                    break;
+                case 1:
+                    coords = [0, defaults.yLimit];
+                    break;
+                case 2:
+                    coords = [defaults.xLimit, defaults.yLimit];
+                    break;
+                case 3:
+                    coords = [defaults.xLimit, 0];
+                    break;
+            }
+            return coords;
+        };
+    })();
 
     var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
         var cell = document.getElementsByClassName(currentPos);
-        //console.log("This cell is checked for collision: " + cell[0].innerHTML);
-        if (!cell[0].innerText) {
-            return 0;
-        } else {
+        console.log("position in checkcoll: " + currentPos + "Colliding inner text length: " + cell[0].innerText.length);
+        if (cell[0].innerText.length > 1) {
+            console.log("REturning true for collision");
             return 1;
+        } else {
+            return 0;
+        }
+    };
+    
+    var isObstacle = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
+        var cell = document.getElementsByClassName(currentPos);
+        if (cell[0].innerHTML.indexOf("X") > -1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    };
+    
+    var isPlayer = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
+        var cell = document.getElementsByClassName(currentPos);
+        if (cell[0].innerHTML.indexOf("O") > -1) {
+            return 1;
+        } else {
+            return 0;
         }
     };
 
@@ -127,34 +179,16 @@ function flyingswords(helper, defaults) {
             helper.removeClassForCell("player", player.position);
             player.position[0] = player.position[0] + xDir;
             player.position[1] = player.position[1] + yDir;
-            //console.log("The player position after move: " + player.position, position);
             updateStage();
-            //console.log(position);
         };
 
         var plot = function () {
-            //console.log("Plot sees player at: " + player.position);
             // Plot player if new positions is empty
             var currentPos = "x" + player.position[0] + " y" + player.position[1];
-            //console.log(currentPos);
             var cell = [];
             cell = document.getElementsByClassName(currentPos);
-            //console.log(currentPos);
-            //console.log(cell);
-            if (!cell[0].innerText) {
-                cell[0].innerText = "O";
-                helper.addClassForCell("player", player.position);
-            } else {
-                cell[0].innerText += "O";
-                cell[0].classList.remove("player");
-                cell[0].classList.remove("obstacle");
-                cell[0].classList.remove("enemy");
-                cell[0].classList.add("dead");
-                alive = false;
-                setTimeout(function () {
-                    gameOver();
-                }, 1000);
-            }
+            cell[0].innerText += "O";
+            cell[0].classList.add("player");
         };
 
         var respawn = function () {
@@ -179,22 +213,38 @@ function flyingswords(helper, defaults) {
     }
 
     var updateStage = function () {
+        var cell = [];
+        var position = "";
+        player.plot();
         if (checkCollision(player.position)) {
-            player.plot();
-            console.log("Would have collided");
+            gameOver();
         } else {
-            player.plot();
             var i = 0;
             var stop = enemies.length;
-            /*for (i = 0; i < stop; i += 1) {
-                enemies[i].move();
-            } */
             for (i = 0; i < stop; i += 1) {
-                console.log("ENEMY POS", + enemies[i].enemyPosition);
-                /*if (helper.innerHTMLofPos(enemies[i].enemyPosition).length > 1) {
-                    enemies[i].alive = false;
-                }*/
-                enemyPlotDelay(i);
+                enemies[i].move();
+                enemies[i].plot();
+                console.log("Enemy position: " + enemies[i].enemyPosition());
+            }
+            for (i = 0; i < stop; i += 1) {
+                if (checkCollision(enemies[i].enemyPosition())) {
+                    enemies[i].kill();
+                    if (isObstacle(enemies[i].enemyPosition())) {
+                        position = "x" + enemies[i].enemyPosition()[0] + " y" + enemies[i].enemyPosition()[1];
+                        cell = document.getElementsByClassName(position);
+                        cell[0].classList.remove("obstacle");
+                        cell[0].classList.add("dead");
+                        cell[0].classList.remove("enemy");
+                    } else if (isPlayer(enemies[i].enemyPosition())) {
+                        gameOver();
+                    } else {
+                        position = "x" + enemies[i].enemyPosition()[0] + " y" + enemies[i].enemyPosition()[1];
+                        cell = document.getElementsByClassName(position);
+                        cell[0].classList.add("dead");
+                        cell[0].classList.remove("enemy");
+                    }
+                    console.log("Killed enemy");
+                }
             }
         }
     };
@@ -206,7 +256,7 @@ function flyingswords(helper, defaults) {
         var y = helper.randomIntFromInterval(0, yLimit);
         var coordinates = [x, y];
         if (spec.skipCollisionCheck === true) {
-            return coordinates
+            return coordinates;
         } else {
             while (checkCollision(coordinates)) {
                 coordinates = genCoordinates({skipCollisionCheck: false});
@@ -240,7 +290,7 @@ function flyingswords(helper, defaults) {
         this.classList.remove("enemy");
         this.classList.remove("dead");
         this.classList.add("obstacle");
-    }
+    };
 
     /**
     * old IE: attachEvent
@@ -268,146 +318,33 @@ function flyingswords(helper, defaults) {
 
     var gameOver = function () {
         helper.clearAllCells();
-        //helper.removeClassForCell("player", player.position);
-        // (The cell at enemy position is not cleared since it is not empty)
         player.alive = true;
         player.respawn();
-        //console.log("GameOver sees player at: " + player.position);
         var i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
-            enemies[i].alive = true;
             enemies[i].respawn();
+            enemies[i].reposition();
         }
         player.plot();
         for (i = 0; i < stop; i += 1) {
             enemies[i].plot();
         }
         placeObstacles();
-
     };
 
-    var enemies = [];
-    var i = 0;
-    var stopindex = defaults.numberOfEnemies;
-    for (i = 0; i < stopindex; i += 1 ) {
-        enemies.push(
-            (function () {
-                var alive = false;
-                var enemyPosition = [];
-                switch (i) {
-                    case 0:
-                        enemyPosition = [0, 0];
-                        break;
-                    case 1:
-                        enemyPosition = [0, defaults.yLimit];
-                        break;
-                    case 2:
-                        enemyPosition = [defaults.xLimit, defaults.yLimit];
-                        break;
-                    case 3:
-                        enemyPosition = [defaults.xLimit, 0];
-                        break;
-                }
-                console.log(enemyPosition);
-
-                var move = function () {
-                    if (alive) {
-                    //console.log("Enemy position before move: " + enemyPosition);
-                    helper.clearCell(enemyPosition);
-                    helper.removeClassForCell("enemy", enemyPosition);
-                    var directionX = calculateDirection(player.position[0], enemyPosition[0]);
-                    var directionY = calculateDirection(player.position[1], enemyPosition[1]);
-                    enemyPosition[0] = enemyPosition[0] + directionX;
-                    enemyPosition[1] = enemyPosition[1] + directionY;
-                    //console.log("Enemy position after move function: " + enemyPosition);
-                    }
-                };
-
-                var calculateDirection = function (player, enemy) {
-                    var direction = 0;
-                    if (player > enemy) {
-                        direction = 1;
-                        return direction;
-                    } else if (player < enemy) {
-                        direction = -1;
-                        return direction;
-                    } else {
-                        return direction;
-                    }
-                };
-
-                var respawn = function () {
-                    //enemyPosition = generateCoordinates({skipCollisionCheck: false});
-                    alive = true;
-                };
-
-                var plot = function () {
-                    if (alive) {
-                        // Plot enemy if new positions is empty
-                        var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
-                        var cell = document.getElementsByClassName(currentPos);
-                        if (!cell[0].innerText) {
-                            cell[0].innerText = "I";
-                            helper.addClassForCell("enemy", enemyPosition);
-                        } else if (cell[0].innerText === "X"){
-                            cell[0].innerText += "I";
-                            alive = false;
-                            //cell[0].classList.remove("player");
-                            cell[0].classList.remove("obstacle");
-                            //cell[0].classList.remove("enemy");
-                            cell[0].classList.add("dead");
-                            //player.alive = false;
-                        } else if (cell[0].innerText === "O") {
-                            cell[0].innerText += "I";
-                            alive = false;
-                            player.alive = false;
-                            cell[0].classList.remove("player");
-                            cell[0].classList.remove("obstacle");
-                            cell[0].classList.remove("enemy");
-                            cell[0].classList.add("dead");
-                            //player.alive = false;
-                            setTimeout(function () {
-                                gameOver();
-                            }, 1000);
-                        } else {
-                            cell[0].innerText += "I";
-                            alive = false;
-                            cell[0].classList.remove("player");
-                            cell[0].classList.remove("obstacle");
-                            cell[0].classList.remove("enemy");
-                            cell[0].classList.add("dead");
-                        }
-                    }
-                };
-
-                return {
-                    alive: alive,
-                    enemyPosition: enemyPosition,
-                    calculateDirection: calculateDirection,
-                    respawn: respawn,
-                    move: move,
-                    plot: plot
-                };
-            }())
-        
-        
-        );
-    }
-    
-    /*
-    var enemy = (function () {
-        var enemyPosition = generateCoordinates({skipCollisionCheck: true});
-
+    var createEnemy = function () {
+        var alive = false;
+        var enemyPosition = [];
         var move = function () {
-            console.log("Enemy position before move: " + enemyPosition);
-            helper.clearCell(enemyPosition);
-            helper.removeClassForCell("enemy", enemyPosition);
-            var directionX = calculateDirection(player.position[0], enemyPosition[0]);
-            var directionY = calculateDirection(player.position[1], enemyPosition[1]);
-            enemyPosition[0] = enemyPosition[0] + directionX;
-            enemyPosition[1] = enemyPosition[1] + directionY;
-            console.log("Enemy position after move function: " + enemyPosition);
+            if (alive) {
+                helper.clearCell(enemyPosition);
+                helper.removeClassForCell("enemy", enemyPosition);
+                var directionX = calculateDirection(player.position[0], enemyPosition[0]);
+                var directionY = calculateDirection(player.position[1], enemyPosition[1]);
+                enemyPosition[0] = enemyPosition[0] + directionX;
+                enemyPosition[1] = enemyPosition[1] + directionY;
+            }
         };
 
         var calculateDirection = function (player, enemy) {
@@ -424,38 +361,53 @@ function flyingswords(helper, defaults) {
         };
 
         var respawn = function () {
-            enemyPosition = [9, 4];
+            alive = true;
+        };
+        
+        var reposition = function () {
+            enemyPosition = putBabyInACorner();
+            console.log("Reposition" + enemyPosition);
         };
 
         var plot = function () {
-            // Plot enemy if new positions is empty
-            var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
-            var cell = document.getElementsByClassName(currentPos);
-            if (!cell[0].innerText) {
-                cell[0].innerText = "I";
-                helper.addClassForCell("enemy", enemyPosition);
-            } else {
+            if (alive) {
+                console.log(enemyPosition);
+                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
+                var cell = document.getElementsByClassName(currentPos);
                 cell[0].innerText += "I";
-                cell[0].classList.remove("player");
-                cell[0].classList.remove("obstacle");
-                cell[0].classList.remove("enemy");
-                cell[0].classList.add("dead");
-                player.alive = false;
-                setTimeout(function () {
-                    gameOver();
-                }, 1000);
+                cell[0].classList.add("enemy");
             }
+        };
+        
+        var reportPosition = function () {
+            return enemyPosition;
+        };
+        
+        var kill = function () {
+            alive = false;
         };
 
         return {
-            enemyPosition: enemyPosition,
+            kill: kill,
+            alive: alive,
+            reposition: reposition,
+            enemyPosition: reportPosition,
             calculateDirection: calculateDirection,
             respawn: respawn,
             move: move,
             plot: plot
         };
-    }());
-    */
+    }
+
+    var enemies = [];
+    var i = 0;
+    var stopindex = defaults.numberOfEnemies;
+    for (i = 0; i < stopindex; i += 1 ) {
+        enemies.push(createEnemy());
+    }
+    for (i=0; i < stopindex; i += 1) {
+        enemies[i].reposition(); 
+    }
 
     var handleKeyboardEvent = function (evt) {
         if (!evt) {
