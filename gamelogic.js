@@ -110,6 +110,7 @@ function flyingswords(helper, defaults) {
         SPACE: 32
     };
     
+    var score = 0;
     
     var putBabyInACorner = (function () {
         var corner = 0;
@@ -179,7 +180,8 @@ function flyingswords(helper, defaults) {
             helper.removeClassForCell("player", player.position);
             player.position[0] = player.position[0] + xDir;
             player.position[1] = player.position[1] + yDir;
-            updateStage();
+            plot();
+            //updateStage();
         };
 
         var plot = function () {
@@ -189,6 +191,8 @@ function flyingswords(helper, defaults) {
             cell = document.getElementsByClassName(currentPos);
             cell[0].innerText += "O";
             cell[0].classList.add("player");
+            if (checkCollision(player.position)) {
+            gameOver();}
         };
 
         var respawn = function () {
@@ -215,10 +219,10 @@ function flyingswords(helper, defaults) {
     var updateStage = function () {
         var cell = [];
         var position = "";
-        player.plot();
+        /*player.plot();
         if (checkCollision(player.position)) {
             gameOver();
-        } else {
+        } else {*/
             var i = 0;
             var stop = enemies.length;
             for (i = 0; i < stop; i += 1) {
@@ -246,7 +250,7 @@ function flyingswords(helper, defaults) {
                     console.log("Killed enemy");
                 }
             }
-        }
+        //}
     };
 
     var generateCoordinates = function genCoordinates(spec) {
@@ -263,6 +267,10 @@ function flyingswords(helper, defaults) {
             }
             return coordinates;
         }
+    };
+    
+    var updateScore = function () {
+        document.getElementById("score").innerText = score;
     };
 
     var placeObstacles = function () {
@@ -389,6 +397,8 @@ function flyingswords(helper, defaults) {
         
         var kill = function () {
             alive = false;
+            //score += 1;
+            //updateScore();
         };
 
         return {
@@ -449,12 +459,13 @@ function flyingswords(helper, defaults) {
         }
     };
 
-
     return {
-        init: init
+        init: init,
+        update: updateStage
     };
 }
 
 var helper = documentModMachine();
 var game = flyingswords(helper, defaults);
 game.init();
+setInterval(game.update, 1000);
