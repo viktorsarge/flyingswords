@@ -386,6 +386,14 @@ function flyingswords(helper, defaults) {
                 cell[0].innerHTML += "I";
                 cell[0].classList.add("enemy");
             } else {
+                var pos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
+                var cell = document.getElementsByClassName(pos);
+                cell[0].innerHTML = "X";
+                helper.addClassForCell("obstacle", enemyPosition);
+                 // Code for Chrome, Safari and Opera
+                cell[0].addEventListener("webkitAnimationEnd", resetObstacle);
+                // Standard syntax
+                cell[0].addEventListener("animationend", resetObstacle);
                 respawn();
                 plot();
             }
@@ -397,6 +405,7 @@ function flyingswords(helper, defaults) {
         
         var kill = function () {
             alive = false;
+
             //score += 1;
             //updateScore();
         };
