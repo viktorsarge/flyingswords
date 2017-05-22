@@ -4,10 +4,10 @@
 // Default values to be used in the program                 //
 // -------------------------------------------------------- //
 
-var defaults = (function() {
+var defaults = (function () {
     var xLimit = 19;
     var yLimit = 9;
-    var playerPos = [Math.floor(xLimit/2), Math.floor(yLimit/2)];
+    var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
     return {
         xLimit: xLimit,
         yLimit: yLimit,
@@ -29,10 +29,10 @@ function documentModMachine() {
         //console.log(defaults);
         var snippet = "<table id=\"gamegrid\" class=\"center\">";
 
-        for (i = 0; i < defaults.yLimit +1 ; i += 1) {
+        for (i = 0; i < defaults.yLimit + 1; i += 1) {
             snippet = snippet + "<tr>";
             //console.log(i);
-            for (j = 0; j < defaults.xLimit +1; j += 1) {
+            for (j = 0; j < defaults.xLimit + 1; j += 1) {
                 snippet = snippet + "<td class=\"x" + j + " y" + i + "\"></td>";
                 //console.log(i, j);
             }
@@ -109,12 +109,12 @@ function flyingswords(helper, defaults) {
         DOWN: 40,
         SPACE: 32
     };
-    
+
     var score = (function () {
         var points = 0;
         //var cell = document.getElementById("score");
         //cell.innerHTML = points;
-        var add = function (){
+        var add = function () {
             points += 1;
             console.log(points);
         };
@@ -125,9 +125,9 @@ function flyingswords(helper, defaults) {
         return {
             add: add,
             reset: reset
-        }
+        };
     })();
-    
+
     var putBabyInACorner = (function () {
         var corner = 0;
         var coords = [];
@@ -137,18 +137,18 @@ function flyingswords(helper, defaults) {
                 corner = 0;
             }
             switch (corner) {
-                case 0:
-                    coords = [0, 0];
-                    break;
-                case 1:
-                    coords = [0, defaults.yLimit];
-                    break;
-                case 2:
-                    coords = [defaults.xLimit, defaults.yLimit];
-                    break;
-                case 3:
-                    coords = [defaults.xLimit, 0];
-                    break;
+            case 0:
+                coords = [0, 0];
+                break;
+            case 1:
+                coords = [0, defaults.yLimit];
+                break;
+            case 2:
+                coords = [defaults.xLimit, defaults.yLimit];
+                break;
+            case 3:
+                coords = [defaults.xLimit, 0];
+                break;
             }
             return coords;
         };
@@ -165,7 +165,7 @@ function flyingswords(helper, defaults) {
             return 0;
         }
     };
-    
+
     var isObstacle = function (coordinates) {
         var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
         var cell = document.getElementsByClassName(currentPos);
@@ -175,7 +175,7 @@ function flyingswords(helper, defaults) {
             return 0;
         }
     };
-    
+
     var isPlayer = function (coordinates) {
         var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
         var cell = document.getElementsByClassName(currentPos);
@@ -208,11 +208,12 @@ function flyingswords(helper, defaults) {
             cell[0].innerText += "O";
             cell[0].classList.add("player");
             if (checkCollision(player.position)) {
-            gameOver();}
+                gameOver();
+            }
         };
 
         var respawn = function () {
-            player.position = [Math.floor(defaults.xLimit/2), Math.floor(defaults.yLimit/2)];
+            player.position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
         };
 
         return {
@@ -224,6 +225,7 @@ function flyingswords(helper, defaults) {
         };
     }());
     
+    /*
     function enemyPlotDelay(i) {
         setTimeout(function() {
             enemies[i].move();
@@ -231,7 +233,8 @@ function flyingswords(helper, defaults) {
         }, 100 * i);
         console.log("Delays");
     }
-
+    */
+    
     var updateStage = function () {
         var cell = [];
         var position = "";
