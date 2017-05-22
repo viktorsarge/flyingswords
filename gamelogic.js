@@ -58,7 +58,7 @@ function documentModMachine() {
 
     var innerHTMLofPos = function (xy) {
         var currentPos = "x" + xy[0] + " y" + xy[1];
-        console.log(xy, currentPos);
+        //console.log(xy, currentPos);
         var cell = document.getElementsByClassName(currentPos);
         return cell[0].innerHTML;
     };
@@ -110,7 +110,23 @@ function flyingswords(helper, defaults) {
         SPACE: 32
     };
     
-    var score = 0;
+    var score = (function () {
+        var points = 0;
+        //var cell = document.getElementById("score");
+        //cell.innerHTML = points;
+        var add = function (){
+            points += 1;
+            console.log(points);
+        };
+        var reset = function () {
+            points = 0;
+            console.log(points + "- Reset");
+        };
+        return {
+            add: add,
+            reset: reset
+        }
+    })();
     
     var putBabyInACorner = (function () {
         var corner = 0;
@@ -141,9 +157,9 @@ function flyingswords(helper, defaults) {
     var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
         var cell = document.getElementsByClassName(currentPos);
-        console.log("position in checkcoll: " + currentPos + "Colliding inner text length: " + cell[0].innerText.length);
+        //console.log("position in checkcoll: " + currentPos + "Colliding inner text length: " + cell[0].innerText.length);
         if (cell[0].innerText.length > 1) {
-            console.log("REturning true for collision");
+            //console.log("REturning true for collision");
             return 1;
         } else {
             return 0;
@@ -228,7 +244,7 @@ function flyingswords(helper, defaults) {
             for (i = 0; i < stop; i += 1) {
                 enemies[i].move();
                 enemies[i].plot();
-                console.log("Enemy position: " + enemies[i].enemyPosition());
+                //console.log("Enemy position: " + enemies[i].enemyPosition());
             }
             for (i = 0; i < stop; i += 1) {
                 if (checkCollision(enemies[i].enemyPosition())) {
@@ -239,6 +255,9 @@ function flyingswords(helper, defaults) {
                         cell[0].classList.remove("obstacle");
                         cell[0].classList.add("dead");
                         cell[0].classList.remove("enemy");
+                        if(player.alive) {
+                            score.add();
+                        }
                     } else if (isPlayer(enemies[i].enemyPosition())) {
                         gameOver();
                     } else {
@@ -246,8 +265,11 @@ function flyingswords(helper, defaults) {
                         cell = document.getElementsByClassName(position);
                         cell[0].classList.add("dead");
                         cell[0].classList.remove("enemy");
+                        if(player.alive) {
+                            score.add();
+                        }
                     }
-                    console.log("Killed enemy");
+                    //console.log("Killed enemy");
                 }
             }
         //}
@@ -267,10 +289,6 @@ function flyingswords(helper, defaults) {
             }
             return coordinates;
         }
-    };
-    
-    var updateScore = function () {
-        document.getElementById("score").innerText = score;
     };
 
     var placeObstacles = function () {
@@ -328,17 +346,19 @@ function flyingswords(helper, defaults) {
         helper.clearAllCells();
         player.alive = true;
         player.respawn();
+        player.plot();
         var i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
             enemies[i].respawn();
             enemies[i].reposition();
         }
-        player.plot();
         for (i = 0; i < stop; i += 1) {
             enemies[i].plot();
         }
         placeObstacles();
+        updateStage();
+        score.reset();
     };
 
     var createEnemy = function () {
@@ -375,12 +395,12 @@ function flyingswords(helper, defaults) {
         
         var reposition = function () {
             enemyPosition = putBabyInACorner();
-            console.log("Reposition" + enemyPosition);
+            //console.log("Reposition" + enemyPosition);
         };
 
         var plot = function () {
             if (alive) {
-                console.log(enemyPosition);
+                //console.log(enemyPosition);
                 var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
                 var cell = document.getElementsByClassName(currentPos);
                 cell[0].innerHTML += "I";
@@ -405,9 +425,6 @@ function flyingswords(helper, defaults) {
         
         var kill = function () {
             alive = false;
-
-            //score += 1;
-            //updateScore();
         };
 
         return {
@@ -439,7 +456,7 @@ function flyingswords(helper, defaults) {
         var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
 
         if (player.alive) {
-            console.log("Input handler sees player at: " + player.position);
+            //console.log("Input handler sees player at: " + player.position);
             switch (keycode) {
             case Key.LEFT:
                 if (player.position[0] > 0) {
