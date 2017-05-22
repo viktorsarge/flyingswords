@@ -5,6 +5,12 @@ body {
     text-align:center;
 }
 
+#instructions {
+    text-align: center;
+    color: white;
+    font-size: 5ex;
+}
+
 table {
     max-width: 100%
     margin-top: 2em;
