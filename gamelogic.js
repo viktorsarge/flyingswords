@@ -24,6 +24,8 @@ var defaults = (function () {
 function documentModMachine() {
 
     var createBoard = function () {
+    // Appends a HTML table to the container with id #gamecontainer
+    // Takes yLimit and xLimit as input for the table dimensions
         var i = 0;
         var j = 0;
         //console.log(defaults);
@@ -33,34 +35,34 @@ function documentModMachine() {
             snippet = snippet + "<tr>";
             //console.log(i);
             for (j = 0; j < defaults.xLimit + 1; j += 1) {
-                snippet = snippet + "<td class=\"x" + j + " y" + i + "\"></td>";
+                snippet = snippet + "<td id=\"x" + j + "y" + i + "\" class=\"x" + j + " y" + i + "\"></td>";
                 //console.log(i, j);
             }
             snippet = snippet + "</tr>";
         }
         var container = document.getElementById("gamecontainer");
-        //console.log(container);
         container.innerHTML = snippet;
         return;
     };
 
-    var clearCell = function (element) {
-        var currentPos = "x" + element[0] + " y" + element[1];
-        var cell = document.getElementsByClassName(currentPos);
-        cell[0].innerText = "";
+    var clearCell = function (xy) {
+    // Clears innerText of a cell. Takes array with x / y as input. 
+        var currentPos = "x" + xy[0] + "y" + xy[1];
+        var cell = document.getElementById(currentPos);
+        cell.innerText = "";
     };
 
     var removeClassForCell = function (className, coordinates) {
-        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
-        var cell = document.getElementsByClassName(currentPos);
-        cell[0].classList.remove(className);
+    // Removes a specified class name from a cell. 
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        cell.classList.remove(className);
     };
 
     var innerHTMLofPos = function (xy) {
-        var currentPos = "x" + xy[0] + " y" + xy[1];
-        //console.log(xy, currentPos);
-        var cell = document.getElementsByClassName(currentPos);
-        return cell[0].innerHTML;
+        var currentPos = "x" + xy[0] + "y" + xy[1];
+        var cell = document.getElementById(currentPos);
+        return cell.innerHTML;
     };
 
     var clearAllCells = function () {
@@ -76,9 +78,9 @@ function documentModMachine() {
     };
 
     var addClassForCell = function (className, coordinates) {
-        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
-        var cell = document.getElementsByClassName(currentPos);
-        cell[0].classList.add(className);
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        cell.classList.add(className);
     };
 
     var randomIntFromInterval = function (min, max) {
@@ -101,7 +103,24 @@ function documentModMachine() {
 //  ------------------------------------------------------------------------------ //
 
 function flyingswords(helper, defaults) {
-    // Keycode names for controls
+
+    var state = "pause";
+    
+    var gameclock = (function () {
+        var clock = "";
+        var start = function () {
+            clock = setInterval(game.update, 1000);
+        };
+        var stop = function () {
+            clearInterval(clock);
+        };
+        return {
+            start: start,
+            stop: stop
+        };
+    })();
+
+    // Cleartext translation of keycodes for readability
     var Key = {
         LEFT: 37,
         UP: 38,
@@ -111,6 +130,7 @@ function flyingswords(helper, defaults) {
     };
 
     var score = (function () {
+    // Scorekeeping. Can add one or reset score. 
         var points = 0;
         //var cell = document.getElementById("score");
         //cell.innerHTML = points;
@@ -129,6 +149,7 @@ function flyingswords(helper, defaults) {
     })();
 
     var putBabyInACorner = (function () {
+    // Returns coordinates of the next corner of the grid at every call
         var corner = 0;
         var coords = [];
         return function () {
@@ -167,9 +188,9 @@ function flyingswords(helper, defaults) {
     };
 
     var isObstacle = function (coordinates) {
-        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
-        var cell = document.getElementsByClassName(currentPos);
-        if (cell[0].innerHTML.indexOf("X") > -1) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerHTML.indexOf("X") > -1) {
             return 1;
         } else {
             return 0;
@@ -177,9 +198,9 @@ function flyingswords(helper, defaults) {
     };
 
     var isPlayer = function (coordinates) {
-        var currentPos = "x" + coordinates[0] + " y" + coordinates[1];
-        var cell = document.getElementsByClassName(currentPos);
-        if (cell[0].innerHTML.indexOf("O") > -1) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerHTML.indexOf("O") > -1) {
             return 1;
         } else {
             return 0;
@@ -202,12 +223,13 @@ function flyingswords(helper, defaults) {
 
         var plot = function () {
             // Plot player if new positions is empty
-            var currentPos = "x" + player.position[0] + " y" + player.position[1];
+            var currentPos = "x" + player.position[0] + "y" + player.position[1];
             var cell = [];
-            cell = document.getElementsByClassName(currentPos);
-            cell[0].innerText += "O";
-            cell[0].classList.add("player");
+            cell = document.getElementById(currentPos);
+            cell.innerText += "O";
+            cell.classList.add("player");
             if (checkCollision(player.position)) {
+                alive = false;
                 gameOver();
             }
         };
@@ -224,6 +246,12 @@ function flyingswords(helper, defaults) {
             respawn: respawn
         };
     }());
+    
+    function gameoverDelay(i) {
+        setTimeout(function() {
+            gameRestart();
+        }, 1500);
+    }
     
     /*
     function enemyPlotDelay(i) {
@@ -343,10 +371,18 @@ function flyingswords(helper, defaults) {
             enemies[i].plot();
         }
         placeObstacles(); 
+        state = "play";
+        gameclock.start();
     };
 
     var gameOver = function () {
+        state = "pause";
+        gameclock.stop(); // clearInterval(gameclock);
         helper.clearAllCells();
+        gameoverDelay();
+    };
+
+    var gameRestart = function () {
         player.alive = true;
         player.respawn();
         player.plot();
@@ -362,7 +398,9 @@ function flyingswords(helper, defaults) {
         placeObstacles();
         updateStage();
         score.reset();
-    };
+        gameclock.start();  //var gameclock = setInterval(game.update, 1000);
+        state = "play";
+    }
 
     var createEnemy = function () {
         var alive = false;
@@ -458,7 +496,7 @@ function flyingswords(helper, defaults) {
         } // for old IE compatible
         var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
 
-        if (player.alive) {
+        if (state === "play") {
             //console.log("Input handler sees player at: " + player.position);
             switch (keycode) {
             case Key.LEFT:
@@ -497,4 +535,3 @@ function flyingswords(helper, defaults) {
 var helper = documentModMachine();
 var game = flyingswords(helper, defaults);
 game.init();
-setInterval(game.update, 1000);
