@@ -74,6 +74,8 @@ function documentModMachine() {
             allCells[i].classList.remove("obstacle");
             allCells[i].classList.remove("player");
             allCells[i].classList.remove("dead");
+            allCells[i].style.backgroundColor = "";
+            allCells[i].style.color = "";
         }
     };
 
@@ -86,6 +88,19 @@ function documentModMachine() {
     var randomIntFromInterval = function (min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     };
+    
+    var displayText = function (input) {
+        var i = 0;
+        var stop = input.length;
+        var cell = document.getElementsByClassName("y" + Math.floor(defaults.yLimit / 2));
+        var indentation = Math.floor((defaults.xLimit-input.length)/2)
+        for (i = 0; i < stop; i += 1) {
+            cell[i + indentation].innerHTML = input[i];
+            cell[i + indentation].style.color = "white";
+            cell[i + indentation].style.backgroundColor = "#F1A94E";
+        }
+        return;
+    };
 
     return {
         innerHTMLofPos: innerHTMLofPos,
@@ -94,7 +109,8 @@ function documentModMachine() {
         clearCell: clearCell,
         removeClassForCell: removeClassForCell,
         clearAllCells: clearAllCells,
-        randomIntFromInterval: randomIntFromInterval
+        randomIntFromInterval: randomIntFromInterval,
+        displayText: displayText
     };
 }
 
@@ -379,10 +395,12 @@ function flyingswords(helper, defaults) {
         state = "pause";
         gameclock.stop(); // clearInterval(gameclock);
         helper.clearAllCells();
+        helper.displayText(["G", "A", "M", "E", "", "O", "V", "E", "R"]);
         gameoverDelay();
     };
 
     var gameRestart = function () {
+        helper.clearAllCells();
         player.alive = true;
         player.respawn();
         player.plot();
