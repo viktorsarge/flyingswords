@@ -1,7 +1,7 @@
 "use strict";
 
 // -------------------------------------------------------- //
-// Default values to be used in the program                 //
+// Default values to be used in the game                    //
 // -------------------------------------------------------- //
 
 var defaults = (function () {
@@ -17,9 +17,9 @@ var defaults = (function () {
     };
 }());
 
-// -------------------------------------------------------- //
-// Some helper functions wrapped in an object               //
-// -------------------------------------------------------- //
+// ------------------------------------------------------------------------------ //
+// Some helper functions for mostly document manipulation wrapped in an object    //
+// -------------------------------------------------------------------------------//
 
 function documentModMachine() {
 
@@ -91,6 +91,7 @@ function documentModMachine() {
     
     var displayText = function (input) {
         var i = 0;
+        input = input.split("");
         var stop = input.length;
         var cell = document.getElementsByClassName("y" + Math.floor(defaults.yLimit / 2));
         var indentation = Math.floor((defaults.xLimit-input.length)/2)
@@ -101,6 +102,19 @@ function documentModMachine() {
         }
         return;
     };
+    
+    var getCellsWithContent = function () {
+        var cells = document.getElementsByTagName("td");
+        var i = 0;
+        var stopindex = cells.length;
+        var cellsWithContent = [];
+        for (i = 0; i < stopindex; i += 1) {
+            if (cells[i].innerHTML.length > 0) {
+                cellsWithContent.push(cells[i]);
+            }
+        }
+        return cellsWithContent;
+    };
 
     return {
         innerHTMLofPos: innerHTMLofPos,
@@ -110,7 +124,8 @@ function documentModMachine() {
         removeClassForCell: removeClassForCell,
         clearAllCells: clearAllCells,
         randomIntFromInterval: randomIntFromInterval,
-        displayText: displayText
+        displayText: displayText,
+        getCellsWithContent: getCellsWithContent
     };
 }
 
@@ -121,7 +136,7 @@ function documentModMachine() {
 function flyingswords(helper, defaults) {
 
     var state = "pause";
-    
+
     var gameclock = (function () {
         var clock = "";
         var start = function () {
@@ -148,15 +163,17 @@ function flyingswords(helper, defaults) {
     var score = (function () {
     // Scorekeeping. Can add one or reset score. 
         var points = 0;
-        //var cell = document.getElementById("score");
-        //cell.innerHTML = points;
+        var cell = document.getElementById("score");
+        cell.innerHTML = points;
         var add = function () {
             points += 1;
             console.log(points);
+            cell.innerHTML = "-" + points + "-";
         };
         var reset = function () {
             points = 0;
             console.log(points + "- Reset");
+            cell.innerHTML = "- " + points + " -";
         };
         return {
             add: add,
@@ -389,13 +406,14 @@ function flyingswords(helper, defaults) {
         placeObstacles(); 
         state = "play";
         gameclock.start();
+        console.log("Cells w content" + helper.getCellsWithContent());
     };
 
     var gameOver = function () {
         state = "pause";
         gameclock.stop(); // clearInterval(gameclock);
         helper.clearAllCells();
-        helper.displayText(["G", "A", "M", "E", "", "O", "V", "E", "R"]);
+        helper.displayText("GAME OVER");
         gameoverDelay();
     };
 
