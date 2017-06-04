@@ -134,7 +134,12 @@ function documentModMachine() {
 //  ------------------------------------------------------------------------------ //
 
 function flyingswords(helper, defaults) {
-
+    var snd = new Audio("flyingswords-krasch.wav");
+    var music = new Audio("gamemusic.wav");
+    music.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
     var state = "pause";
 
     var gameclock = (function () {
@@ -285,17 +290,7 @@ function flyingswords(helper, defaults) {
             gameRestart();
         }, 1500);
     }
-    
-    /*
-    function enemyPlotDelay(i) {
-        setTimeout(function() {
-            enemies[i].move();
-            enemies[i].plot();
-        }, 100 * i);
-        console.log("Delays");
-    }
-    */
-    
+
     var updateStage = function () {
         var cell = [];
         var position = "";
@@ -313,6 +308,7 @@ function flyingswords(helper, defaults) {
             for (i = 0; i < stop; i += 1) {
                 if (checkCollision(enemies[i].enemyPosition())) {
                     enemies[i].kill();
+                    snd.play();
                     if (isObstacle(enemies[i].enemyPosition())) {
                         position = "x" + enemies[i].enemyPosition()[0] + " y" + enemies[i].enemyPosition()[1];
                         cell = document.getElementsByClassName(position);
@@ -333,7 +329,6 @@ function flyingswords(helper, defaults) {
                             score.add();
                         }
                     }
-                    //console.log("Killed enemy");
                 }
             }
         //}
@@ -407,11 +402,12 @@ function flyingswords(helper, defaults) {
         state = "play";
         gameclock.start();
         console.log("Cells w content" + helper.getCellsWithContent());
+        music.play();
     };
 
     var gameOver = function () {
         state = "pause";
-        gameclock.stop(); // clearInterval(gameclock);
+        gameclock.stop();
         helper.clearAllCells();
         helper.displayText("GAME OVER");
         gameoverDelay();
@@ -434,7 +430,7 @@ function flyingswords(helper, defaults) {
         placeObstacles();
         updateStage();
         score.reset();
-        gameclock.start();  //var gameclock = setInterval(game.update, 1000);
+        gameclock.start();
         state = "play";
     }
 
@@ -556,7 +552,7 @@ function flyingswords(helper, defaults) {
                 }
                 break;
             case Key.SPACE:
-                player.movePlayer(0, 0);
+                //state = "pause";//player.movePlayer(0, 0);
                 break;
             }
         }

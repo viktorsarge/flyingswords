@@ -2,12 +2,12 @@
     font-family: 'Vermin';
     src: url('Vermin_vibes_1989.ttf') format('truetype');
 }
+
 body {
     background-color: #5D4C46;
     font-family: 'Vermin';
 }
-    
-}
+
 .gamecontainer {
     text-align:center;
 }
@@ -27,7 +27,7 @@ body {
     background: -moz-linear-gradient(right, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* For Firefox 3.6 to 15 */
     background: linear-gradient(to right, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* Standard syntax (must be last) */
 }
-}
+
 
 table {
     max-width: 100%;
@@ -42,13 +42,13 @@ table.center {
 }
 
 td {
-    width:2em;
-    height:2em;
-    font-size:2em;
+    width:4.2vw;
+    height:4.2vw;
+    font-size:2.6em;
     color: black;
     background-color: #F2EDD8;
     text-align:center;
-    border-radius:0.2em;
+    border-radius:0.5vw;
     transition: background-color 0.6s;    
 }
 
