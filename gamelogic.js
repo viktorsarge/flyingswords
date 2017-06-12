@@ -192,6 +192,16 @@ function flyingswords(helper, defaults) {
         }
     };
 
+    var isEmpty = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerText.length > 0) {
+            return 0;
+        } else {
+            return 1;
+        }
+    };
+
     var soundengine = (function () {
         var musicon = true;
         var music = new Audio("gamemusic.wav");
@@ -324,7 +334,6 @@ function flyingswords(helper, defaults) {
 
         var reposition = function () {
             enemyPosition = putBabyInACorner();
-            //console.log("Reposition" + enemyPosition);
         };
 
         var plot = function () {
@@ -345,8 +354,6 @@ function flyingswords(helper, defaults) {
                 // Standard syntax
                 cell.addEventListener("animationend", resetObstacle);
 
-                //respawn();
-                //plot();
             }
         };
 
@@ -459,7 +466,7 @@ function flyingswords(helper, defaults) {
         if (spec.skipCollisionCheck === true) {
             return coordinates;
         } else {
-            while (checkCollision(coordinates)) {
+            while (!isEmpty(coordinates)) {
                 coordinates = genCoordinates({skipCollisionCheck: false});
             }
             return coordinates;
@@ -472,17 +479,16 @@ function flyingswords(helper, defaults) {
         var pos = "";
         var cell = [];
         var stopIndex = defaults.numberOfObstacles;
+
         for (i = 0; i < stopIndex; i += 1) {
             coordinates = generateCoordinates({skipCollisionCheck: false});
-            pos = "x" + coordinates[0] + " y" + coordinates[1];
-            cell = document.getElementsByClassName(pos);
-            cell[0].innerHTML = "X";
+            pos = "x" + coordinates[0] + "y" + coordinates[1];
+            cell = document.getElementById(pos);
+            cell.innerHTML = "X";
             helper.addClassForCell("obstacle", coordinates);
 
-            // Code for Chrome, Safari and Opera
-            cell[0].addEventListener("webkitAnimationEnd", resetObstacle);
-            // Standard syntax
-            cell[0].addEventListener("animationend", resetObstacle);
+            cell.addEventListener("webkitAnimationEnd", resetObstacle); // Chrome, Safari, opera
+            cell.addEventListener("animationend", resetObstacle);  // Standard syntax
         }
         return coordinates;
     };
@@ -556,17 +562,6 @@ function flyingswords(helper, defaults) {
         for (i = 0; i < stop; i += 1) {
             enemySpawner.add();
         }
-
-        /*var i = 0;
-        var stop = enemies.length;
-        for (i = 0; i < stop; i += 1) {
-            enemies[i].respawn();
-            enemies[i].reposition();
-        }
-        for (i = 0; i < stop; i += 1) {
-            enemies[i].plot();
-        }*/
-
         placeObstacles();
         updateStage();
         score.reset();
@@ -582,7 +577,6 @@ function flyingswords(helper, defaults) {
         for (i = 0; i < stop; i += 1) {
             enemies[i].move();
             enemies[i].plot();
-            //console.log("Enemy position: " + enemies[i].enemyPosition());
         }
         for (i = 0; i < stop; i += 1) {
             if (checkCollision(enemies[i].enemyPosition())) {
@@ -631,7 +625,6 @@ function flyingswords(helper, defaults) {
         var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
 
         if (state === "play") {
-            //console.log("Input handler sees player at: " + player.position);
             switch (keycode) {
             case Key.LEFT:
                 if (player.position[0] > 0) {
@@ -686,13 +679,10 @@ function flyingswords(helper, defaults) {
         helper.createBoard();
         player.plot();
         addEventListener("keydown", document, handleKeyboardEvent);
-        
-        // TODO - move to a spawner function
-        
+
         var i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
-            enemies[i].respawn();
             enemies[i].plot();
         }
         placeObstacles();
@@ -706,12 +696,8 @@ function flyingswords(helper, defaults) {
     var i = 0;
     var stopindex = defaults.numberOfEnemies;
     for (i = 0; i < stopindex; i += 1) {
-        //enemies.push(createEnemy());
         enemySpawner.add();
     }
-    /*for (i = 0; i < stopindex; i += 1) {
-        enemies[i].reposition(); 
-    }*/
 
     return {
         init: init,
