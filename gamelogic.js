@@ -1,51 +1,5 @@
 "use strict";
 
-// -------------------------------------------------------- //
-// Default values to be used in the game                    //
-// -------------------------------------------------------- //
-
-var defaults = (function () {
-    var xLimit = 19;
-    var yLimit = 9;
-    var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
-    var levels = [
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        },
-        {
-            killsRequired: 10
-        }
-    ];
-    return {
-        xLimit: xLimit,
-        yLimit: yLimit,
-        playerPos: playerPos,
-        numberOfObstacles: 10,
-        numberOfEnemies: 4,
-        levels: levels
-    };
-}());
 
 // ------------------------------------------------------------------------------ //
 // Some helper functions for mostly document manipulation wrapped in an object    //
@@ -353,7 +307,6 @@ function flyingswords(helper, defaults) {
                 cell.addEventListener("webkitAnimationEnd", resetObstacle);
                 // Standard syntax
                 cell.addEventListener("animationend", resetObstacle);
-
             }
         };
 
@@ -365,7 +318,7 @@ function flyingswords(helper, defaults) {
             alive = false;
             enemySpawner.add();
             kills += 1;
-            if (kills-1 === defaults.levels[currentLevel].killsRequired) {
+            if (kills - 1 === defaults.levels[currentLevel].killsRequired) {
                 levelUp();
             }
         };
@@ -598,7 +551,7 @@ function flyingswords(helper, defaults) {
                     cell = document.getElementsByClassName(position);
                     cell[0].classList.add("dead");
                     cell[0].classList.remove("enemy");
-                    if(player.alive) {
+                    if (player.alive) {
                         score.add();
                     }
                 }
