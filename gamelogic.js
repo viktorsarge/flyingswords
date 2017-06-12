@@ -19,7 +19,22 @@ var defaults = (function () {
             killsRequired: 10
         },
         {
-            killsRequired: 20
+            killsRequired: 10
+        },
+        {
+            killsRequired: 10
+        },
+        {
+            killsRequired: 10
+        },
+        {
+            killsRequired: 10
+        },
+        {
+            killsRequired: 10
+        },
+        {
+            killsRequired: 10
         }
     ];
     return {
@@ -343,7 +358,7 @@ function flyingswords(helper, defaults) {
             alive = false;
             enemySpawner.add();
             kills += 1;
-            if (kills === defaults.levels[currentLevel].killsRequired) {
+            if (kills-1 === defaults.levels[currentLevel].killsRequired) {
                 levelUp();
             }
         };
@@ -531,6 +546,7 @@ function flyingswords(helper, defaults) {
     var gameRestart = function () {
         score.reset();
         currentLevel = 0;
+        kills = 0;
         helper.clearAllCells();
         player.alive = true;
         player.respawn();
@@ -686,7 +702,6 @@ function flyingswords(helper, defaults) {
         soundengine.music.play();
     };
 
-
     // Creating the enemies
     var i = 0;
     var stopindex = defaults.numberOfEnemies;
@@ -694,9 +709,9 @@ function flyingswords(helper, defaults) {
         //enemies.push(createEnemy());
         enemySpawner.add();
     }
-    for (i = 0; i < stopindex; i += 1) {
+    /*for (i = 0; i < stopindex; i += 1) {
         enemies[i].reposition(); 
-    }
+    }*/
 
     return {
         init: init,
