@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Vermin';
-    src: url('Vermin_vibes_1989.ttf') format('truetype');
+    src: url('Vermin_vibes.ttf') format('truetype');
 }
 
 body {
@@ -48,7 +48,7 @@ td {
     color: black;
     background-color: #F2EDD8;
     text-align:center;
-    border-radius:0.5vw;
+    border-radius:0.3vw;
     transition: background-color 0.6s;    
 }
 
@@ -70,6 +70,7 @@ td {
 {
     background-color: #F1A94E;
     color: #E45641;
+
 }
 
 .dead {

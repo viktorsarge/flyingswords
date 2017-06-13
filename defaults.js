@@ -5,8 +5,8 @@
 // -------------------------------------------------------- //
 
 var defaults = (function () {
-    var xLimit = 19;
-    var yLimit = 9;
+    var xLimit = 14;
+    var yLimit = 8;
     var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
     var levels = [
         {
