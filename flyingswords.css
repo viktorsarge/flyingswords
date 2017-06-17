@@ -70,7 +70,10 @@ td {
 {
     background-color: #F1A94E;
     color: #E45641;
+}
 
+.noanimation {
+    animation: 0;
 }
 
 .dead {

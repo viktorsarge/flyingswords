@@ -341,7 +341,6 @@ function flyingswords(helper, defaults) {
             cell = document.getElementById(pos);
             cell.innerHTML = "X";
             helper.addClassForCell("obstacle", coordinates);
-
             cell.addEventListener("webkitAnimationEnd", resetObstacle); // Chrome, Safari, opera
             cell.addEventListener("animationend", resetObstacle);  // Standard syntax
         }
@@ -375,11 +374,11 @@ function flyingswords(helper, defaults) {
         kills = 0;
         state = "pause";
         gameclock.stop();
+        helper.clearAllCells();
         currentLevel += 1;
         levelnumber = currentLevel + 1;
         enemySpawner.resetSpawnlimit();
         enemies = [];
-        helper.clearAllCells();
         helper.displayText("LEVEL " + levelnumber);
         delayFunction(startLevel, 1500);
     };

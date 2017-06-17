@@ -58,6 +58,8 @@ function documentModMachine() {
             allCells[i].classList.remove("obstacle");
             allCells[i].classList.remove("player");
             allCells[i].classList.remove("dead");
+            allCells[i].classList.add("noanimation");
+            allCells[i].classList.remove("noanimation");
             allCells[i].style.backgroundColor = "";
             allCells[i].style.color = "";
         }
