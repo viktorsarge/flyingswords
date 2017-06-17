@@ -495,8 +495,11 @@ function flyingswords(helper, defaults) {
         };
         var add = function () {
             console.log("Spawn limit" + spawnlimit);
+            var enemy = "";
             if (spawnlimit > 0) {
-                enemies.push(createEnemy());
+                enemy = createEnemy();
+                enemy.plot()
+                enemies.push(enemy);
                 spawnlimit -= 1;
                 return true;
             } else {
