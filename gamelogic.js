@@ -348,16 +348,10 @@ function flyingswords(helper, defaults) {
         return coordinates;
     };
 
-    function gameoverDelay() {
+        function delayFunction(toCall, time) {
         setTimeout(function () {
-            gameRestart();
-        }, 1500);
-    }
-
-    function levelUpDelay() {
-        setTimeout(function () {
-            startLevel();
-        }, 1500);
+            toCall();
+        }, time);
     }
 
 // ------------------------------------------------------------------------------
@@ -373,7 +367,7 @@ function flyingswords(helper, defaults) {
         currentLevel = 0;
         enemySpawner.resetSpawnlimit();
         helper.displayText("GAME OVER");
-        gameoverDelay();
+        delayFunction(gameRestart, 1500);
     };
     
     var levelUp = function () {
@@ -387,7 +381,7 @@ function flyingswords(helper, defaults) {
         enemies = [];
         helper.clearAllCells();
         helper.displayText("LEVEL " + levelnumber);
-        levelUpDelay();
+        delayFunction(startLevel, 1500);
     };
 
     var startLevel = function () {
