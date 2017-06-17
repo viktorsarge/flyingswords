@@ -1,6 +1,5 @@
 "use strict";
 
-
 //  ------------------------------------------------------------------------------ //
 //  The game object below                                                          //
 //  ------------------------------------------------------------------------------ //
@@ -9,20 +8,6 @@ function flyingswords(helper, defaults) {
     var currentLevel = 0;
     var kills = 0;
     var enemies = [];
-/*
-    function cleanOutDead (enem) {
-        var i = 0;
-        var stop = enem.length;
-        var splicelist = [];
-        for (i = stop; i > 0; i -= 1) {
-            if (!enem[i].reportAliveStatus()) {
-                console.log("Enemy " + i + "dead");
-                enem.splice(i, 1);
-            }
-        }
-    return enem;
-    }
-*/
 
     var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
@@ -81,7 +66,6 @@ function flyingswords(helper, defaults) {
             player.position[0] = player.position[0] + xDir;
             player.position[1] = player.position[1] + yDir;
             plot();
-            //updateStage();  // For a more chess styled gameplay
         };
 
         var plot = function () {
@@ -169,33 +153,37 @@ function flyingswords(helper, defaults) {
             }
         };
 
-        var respawn = function () {
-            enemyPosition = putBabyInACorner();
-            alive = true;
-        };
-
-        var reposition = function () {
-            enemyPosition = putBabyInACorner();
-        };
-
-        var plot = function () {
-            var cell = "";
-            if (alive) {
-                //console.log(enemyPosition);
-                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
-                cell = document.getElementsByClassName(currentPos);
-                cell[0].innerHTML += "I";
-                cell[0].classList.add("enemy");
-            } else {
-                var pos = "x" + enemyPosition[0] + "y" + enemyPosition[1];
-                cell = document.getElementById(pos);
+        var collisioncheck = function () {
+            var currentPos = "x" + enemyPosition[0] + "y" + enemyPosition[1];
+            var cell = document.getElementById(currentPos);
+            if (isPlayer(enemyPosition)) {
+                gameOver();
+            } else if (isObstacle(enemyPosition)) {
+                kill();
+                cell.classList.remove("obstacle");
+                cell.classList.add("dead");
+                cell.classList.remove("enemy");
+            } else if (isEnemy(enemyPosition) && cell.innerHTML.length > 1) {
+                kill();
                 cell.innerHTML = "X";
                 helper.addClassForCell("obstacle", enemyPosition);
+                cell.classList.add("dead");
+                cell.classList.remove("enemy");
                  // Code for Chrome, Safari and Opera
                 cell.addEventListener("webkitAnimationEnd", resetObstacle);
                 // Standard syntax
                 cell.addEventListener("animationend", resetObstacle);
             }
+        };
+
+        var plot = function () {
+            var cell = "";
+            if (reportAliveStatus()) {
+                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
+                cell = document.getElementsByClassName(currentPos);
+                cell[0].innerHTML += "I";
+                cell[0].classList.add("enemy");
+            } 
         };
 
         var reportPosition = function () {
@@ -206,7 +194,8 @@ function flyingswords(helper, defaults) {
             alive = false;
             enemySpawner.add();
             kills += 1;
-            if (kills - 1 === defaults.levels[currentLevel].killsRequired) {
+            score.add();
+            if (kills === defaults.levels[currentLevel].killsRequired) {
                 levelUp();
             }
         };
@@ -215,12 +204,27 @@ function flyingswords(helper, defaults) {
             reportAliveStatus: reportAliveStatus,
             kill: kill,
             alive: alive,
-            reposition: reposition,
+
             enemyPosition: reportPosition,
             calculateDirection: calculateDirection,
-            respawn: respawn,
+
+            collisioncheck: collisioncheck,
             move: move,
             plot: plot
+        };
+    };
+    
+    var cell = function () {
+        var content = [];
+        var add = function (symbol) {
+            content.push(symbol);
+        };
+        var clear = function () {
+            content = [];
+        };
+        return {
+            add: add,
+            clear: clear
         };
     };
 
@@ -234,7 +238,7 @@ function flyingswords(helper, defaults) {
         cell.innerHTML = points;
         var add = function () {
             points += 1;
-            console.log(points);
+            console.log("Points:" + points);
             cell.innerHTML = "-" + points + "-";
         };
         var reset = function () {
@@ -257,6 +261,16 @@ function flyingswords(helper, defaults) {
             return 0;
         }
     };
+    
+    var isEnemy = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerHTML.indexOf("I") > -1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    };
 
     var isPlayer = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
@@ -271,7 +285,7 @@ function flyingswords(helper, defaults) {
     var gameclock = (function () {
         var clock = "";
         var start = function () {
-            clock = setInterval(game.update, 1000);
+            clock = setInterval(game.update, defaults.levels[currentLevel].clockSpeed);
         };
         var stop = function () {
             clearInterval(clock);
@@ -411,38 +425,17 @@ function flyingswords(helper, defaults) {
     };
 
     var updateStage = function () {
-        var cell = [];
-        var position = "";
         var i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
-            enemies[i].move();
-            enemies[i].plot();
+            if (enemies[i].reportAliveStatus()) {
+                enemies[i].move();
+                enemies[i].plot();
+            }
         }
         for (i = 0; i < stop; i += 1) {
-            if (checkCollision(enemies[i].enemyPosition())) {
-                enemies[i].kill();
-                snd.play();
-                if (isObstacle(enemies[i].enemyPosition())) {
-                    position = "x" + enemies[i].enemyPosition()[0] + " y" + enemies[i].enemyPosition()[1];
-                    cell = document.getElementsByClassName(position);
-                    cell[0].classList.remove("obstacle");
-                    cell[0].classList.add("dead");
-                    cell[0].classList.remove("enemy");
-                    if (player.alive) {
-                        score.add();
-                    }
-                } else if (isPlayer(enemies[i].enemyPosition())) {
-                    gameOver();
-                } else {
-                    position = "x" + enemies[i].enemyPosition()[0] + " y" + enemies[i].enemyPosition()[1];
-                    cell = document.getElementsByClassName(position);
-                    cell[0].classList.add("dead");
-                    cell[0].classList.remove("enemy");
-                    if (player.alive) {
-                        score.add();
-                    }
-                }
+            if (enemies[i].reportAliveStatus()) {
+                enemies[i].collisioncheck();
             }
         }
     };
@@ -519,6 +512,12 @@ function flyingswords(helper, defaults) {
     var init = function () {
         helper.createBoard();
         player.plot();
+        // Creating the enemies
+        var i = 0;
+        var stopindex = defaults.numberOfEnemies;
+        for (i = 0; i < stopindex; i += 1) {
+            enemySpawner.add();
+        }
         addEventListener("keydown", document, handleKeyboardEvent);
 
         var i = 0;
@@ -529,16 +528,8 @@ function flyingswords(helper, defaults) {
         placeObstacles();
         state = "play";
         gameclock.start();
-        console.log("Cells w content" + helper.getCellsWithContent());
         soundengine.music.play();
     };
-
-    // Creating the enemies
-    var i = 0;
-    var stopindex = defaults.numberOfEnemies;
-    for (i = 0; i < stopindex; i += 1) {
-        enemySpawner.add();
-    }
 
     return {
         init: init,
