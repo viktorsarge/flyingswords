@@ -8,6 +8,13 @@ body {
     font-family: 'Vermin';
 }
 
+#stats {
+    text-align: right;
+    color: white;
+    font-size: 30px;
+    width: 50%;
+}
+
 .gamecontainer {
     text-align:center;
 }
@@ -18,15 +25,13 @@ body {
     font-size: 5ex;
 }
 
-#score {
-    text-align: center;
-    color: white;
-    font-size: 5ex;
-    background: -webkit-linear-gradient(left, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(right, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(right, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(to right, rgba(68,179,194,0), rgba(68,179,194,1), rgba(68,179,194,0)); /* Standard syntax (must be last) */
-}
+#stats p {
+    padding-right: 10px;
+    background: -webkit-linear-gradient(left, rgba(68,179,194,0), rgba(68,179,194,1)); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(right, rgba(68,179,194,0), rgba(68,179,194,1)); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(right, rgba(68,179,194,0), rgba(68,179,194,1)); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to right, rgba(68,179,194,0), rgba(68,179,194,1)); /* Standard syntax (must be last) */
+} 
 
 
 table {

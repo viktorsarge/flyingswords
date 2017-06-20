@@ -195,6 +195,7 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
             kills += 1;
             score.add();
+            updateStats();
             if (kills === defaults.levels[currentLevel].killsRequired) {
                 levelUp();
             }
@@ -213,7 +214,8 @@ function flyingswords(helper, defaults) {
             plot: plot
         };
     };
-    
+
+   /*
     var cell = function () {
         var content = [];
         var add = function (symbol) {
@@ -226,7 +228,7 @@ function flyingswords(helper, defaults) {
             add: add,
             clear: clear
         };
-    };
+    };*/
 
 // ------------------------------------------------------------------------------
 //          General game specific helpers
@@ -282,6 +284,12 @@ function flyingswords(helper, defaults) {
         }
     };
 
+    var updateStats = function () {
+        var remain = defaults.levels[currentLevel].killsRequired - kills;
+        var cell = document.getElementById("leftToKill");
+        cell.innerHTML = remain;
+    };
+    
     var gameclock = (function () {
         var clock = "";
         var start = function () {
@@ -368,7 +376,7 @@ function flyingswords(helper, defaults) {
         helper.displayText("GAME OVER");
         delayFunction(gameRestart, 1500);
     };
-    
+
     var levelUp = function () {
         var levelnumber = 0;
         kills = 0;
@@ -491,7 +499,7 @@ function flyingswords(helper, defaults) {
             var enemy = "";
             if (spawnlimit > 0) {
                 enemy = createEnemy();
-                enemy.plot()
+                enemy.plot();
                 enemies.push(enemy);
                 spawnlimit -= 1;
                 return true;
@@ -499,8 +507,12 @@ function flyingswords(helper, defaults) {
                 return false;
             }
         };
+        var remainingEnemies = function () {
+            return spawnlimit;
+        };
         return {
             add: add,
+            remainingEnemies: remainingEnemies,
             resetSpawnlimit: resetSpawnlimit
         };
     }());
@@ -516,7 +528,7 @@ function flyingswords(helper, defaults) {
         }
         addEventListener("keydown", document, handleKeyboardEvent);
 
-        var i = 0;
+        i = 0;
         var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
             enemies[i].plot();
