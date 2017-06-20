@@ -240,12 +240,10 @@ function flyingswords(helper, defaults) {
         cell.innerHTML = points;
         var add = function () {
             points += 1;
-            console.log("Points:" + points);
-            cell.innerHTML = "-" + points + "-";
+            cell.innerHTML = points;
         };
         var reset = function () {
             points = 0;
-            console.log(points + "- Reset");
             cell.innerHTML = "- " + points + " -";
         };
         return {
@@ -402,6 +400,7 @@ function flyingswords(helper, defaults) {
         }
         placeObstacles();
         state = "play";
+        updateStats();
         gameclock.start();
     };
 
@@ -537,6 +536,7 @@ function flyingswords(helper, defaults) {
         state = "play";
         gameclock.start();
         soundengine.music.play();
+        updateStats();
     };
 
     return {
