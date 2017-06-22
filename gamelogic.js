@@ -244,7 +244,7 @@ function flyingswords(helper, defaults) {
         };
         var reset = function () {
             points = 0;
-            cell.innerHTML = "- " + points + " -";
+            cell.innerHTML = points;
         };
         return {
             add: add,
@@ -287,20 +287,6 @@ function flyingswords(helper, defaults) {
         var cell = document.getElementById("leftToKill");
         cell.innerHTML = remain;
     };
-    
-    var gameclock = (function () {
-        var clock = "";
-        var start = function () {
-            clock = setInterval(game.update, defaults.levels[currentLevel].clockSpeed);
-        };
-        var stop = function () {
-            clearInterval(clock);
-        };
-        return {
-            start: start,
-            stop: stop
-        };
-    }());
 
     // Cleartext translation of keycodes for readability
     var Key = {
@@ -362,11 +348,9 @@ function flyingswords(helper, defaults) {
 // ------------------------------------------------------------------------------
 //          Game logic at most abstract level
 // ------------------------------------------------------------------------------
-    var state = "pause";
 
     var gameOver = function () {
-        state = "pause";
-        gameclock.stop();
+        pauseController.pause();
         helper.clearAllCells();
         enemies = [];
         currentLevel = 0;
@@ -378,8 +362,7 @@ function flyingswords(helper, defaults) {
     var levelUp = function () {
         var levelnumber = 0;
         kills = 0;
-        state = "pause";
-        gameclock.stop();
+        pauseController.pause();
         helper.clearAllCells();
         currentLevel += 1;
         levelnumber = currentLevel + 1;
@@ -399,9 +382,8 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
-        state = "play";
         updateStats();
-        gameclock.start();
+        pauseController.unpause();
     };
 
     var gameRestart = function () {
@@ -420,8 +402,7 @@ function flyingswords(helper, defaults) {
         placeObstacles();
         updateStage();
         score.reset();
-        gameclock.start();
-        state = "play";
+        pauseController.unpause();
     };
 
     var updateStage = function () {
@@ -458,7 +439,7 @@ function flyingswords(helper, defaults) {
         } // for old IE compatible
         var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
 
-        if (state === "play") {
+        if (!pauseController.isPaused()) {
             switch (keycode) {
             case Key.LEFT:
                 if (player.position[0] > 0) {
@@ -481,7 +462,7 @@ function flyingswords(helper, defaults) {
                 }
                 break;
             case Key.SPACE:
-                //state = "pause";//player.movePlayer(0, 0);
+                // Used previously as no move in chess styled gamemode. 
                 break;
             }
         }
@@ -533,16 +514,39 @@ function flyingswords(helper, defaults) {
             enemies[i].plot();
         }
         placeObstacles();
-        state = "play";
-        gameclock.start();
+        pauseController.unpause();
         soundengine.music.play();
         updateStats();
     };
+    
+    var pauseController = (function () {
+        var paused = true;
+        var clock = "";
+        var pause = function () {
+            paused = true;
+            clearInterval(clock);
+            return paused;
+        };
+        var unpause = function () {
+            clock = setInterval(game.update, defaults.levels[currentLevel].clockSpeed);
+            paused = false;
+            return paused;
+        };
+        var isPaused = function () {
+            return paused; 
+        };
+        return {
+            pause: pause, 
+            unpause: unpause,
+            isPaused: isPaused
+        };
+    }()); 
 
     return {
         init: init,
         soundengine: soundengine,
-        update: updateStage
+        update: updateStage,
+        pauseController: pauseController
     };
 }
 
