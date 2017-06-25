@@ -121,6 +121,7 @@ function flyingswords(helper, defaults) {
         };
     }());
 
+
     var createEnemy = function () {
         var alive = true;
         var enemyPosition = putBabyInACorner();
@@ -294,7 +295,8 @@ function flyingswords(helper, defaults) {
         UP: 38,
         RIGHT: 39,
         DOWN: 40,
-        SPACE: 32
+        SPACE: 32,
+        P: 80
     };
 
     var resetObstacle = function () {
@@ -400,8 +402,8 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
-        updateStage();
         score.reset();
+        updateStage();
         pauseController.unpause();
     };
 
@@ -461,10 +463,18 @@ function flyingswords(helper, defaults) {
                     player.movePlayer(0, 1);
                 }
                 break;
-            case Key.SPACE:
-                // Used previously as no move in chess styled gamemode. 
+            case Key.P:
+                if (pauseController.isPaused()) {
+                    pauseController.unpause();
+                } else {
+                    pauseController.pause();
+                }
                 break;
             }
+        } else {
+             if (keycode === 80) {
+                 pauseController.unpause();
+             }
         }
     };
 
