@@ -77,7 +77,12 @@ function flyingswords(helper, defaults) {
             cell.classList.add("player");
             if (checkCollision(player.position)) {
                 alive = false;
-                gameOver();
+                pauseController.pause();
+                cell.classList.add("dead");
+                // Code for Chrome, Safari and Opera
+                cell.addEventListener("webkitAnimationEnd", gameOver);
+                // Standard syntax
+                cell.addEventListener("animationend", gameOver);
             }
         };
 
@@ -121,6 +126,14 @@ function flyingswords(helper, defaults) {
         };
     }());
 
+    var createBoss = function () {
+        var alive = true; 
+        var position = [];  // Todo: Assign four spaces
+        
+        var move = function () {};
+        
+        var plot = function () {};
+    };
 
     var createEnemy = function () {
         var alive = true;
@@ -158,7 +171,14 @@ function flyingswords(helper, defaults) {
             var currentPos = "x" + enemyPosition[0] + "y" + enemyPosition[1];
             var cell = document.getElementById(currentPos);
             if (isPlayer(enemyPosition)) {
-                gameOver();
+                pauseController.pause();
+                cell.classList.remove("player");
+                cell.classList.remove("enemy");
+                cell.classList.add("dead");
+                // Code for Chrome, Safari and Opera
+                cell.addEventListener("webkitAnimationEnd", gameOver);
+                // Standard syntax
+                cell.addEventListener("animationend", gameOver);
             } else if (isObstacle(enemyPosition)) {
                 kill();
                 cell.classList.remove("obstacle");
@@ -170,7 +190,7 @@ function flyingswords(helper, defaults) {
                 helper.addClassForCell("obstacle", enemyPosition);
                 cell.classList.add("dead");
                 cell.classList.remove("enemy");
-                 // Code for Chrome, Safari and Opera
+                // Code for Chrome, Safari and Opera
                 cell.addEventListener("webkitAnimationEnd", resetObstacle);
                 // Standard syntax
                 cell.addEventListener("animationend", resetObstacle);
@@ -198,7 +218,8 @@ function flyingswords(helper, defaults) {
             score.add();
             updateStats();
             if (kills === defaults.levels[currentLevel].killsRequired) {
-                levelUp();
+                pauseController.pause();
+                delayFunction(levelUp, 1500);
             }
         };
 
@@ -206,10 +227,8 @@ function flyingswords(helper, defaults) {
             reportAliveStatus: reportAliveStatus,
             kill: kill,
             alive: alive,
-
             enemyPosition: reportPosition,
             calculateDirection: calculateDirection,
-
             collisioncheck: collisioncheck,
             move: move,
             plot: plot
@@ -364,7 +383,6 @@ function flyingswords(helper, defaults) {
     var levelUp = function () {
         var levelnumber = 0;
         kills = 0;
-        pauseController.pause();
         helper.clearAllCells();
         currentLevel += 1;
         levelnumber = currentLevel + 1;

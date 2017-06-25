@@ -84,7 +84,7 @@ td {
 .dead {
     background-color: #E45641;
     animation-name: deathAnimation;
-    animation-duration: 3s;
+    animation-duration: 2s;
     animation-iteration-count: 1;
     animation-direction: normal;    
 }
