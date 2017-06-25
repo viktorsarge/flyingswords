@@ -346,7 +346,7 @@ function flyingswords(helper, defaults) {
         var coordinates = [];
         var pos = "";
         var cell = [];
-        var stopIndex = defaults.numberOfObstacles;
+        var stopIndex = defaults.levels[currentLevel].numberOfObstacles;
 
         for (i = 0; i < stopIndex; i += 1) {
             coordinates = generateCoordinates({skipCollisionCheck: false});
@@ -397,7 +397,7 @@ function flyingswords(helper, defaults) {
         player.respawn();
         player.plot();
         var i = 0;
-        var stop = defaults.numberOfEnemies;
+        var stop = defaults.levels[currentLevel].numberOfEnemies;
         for (i = 0; i < stop; i += 1) {
             enemySpawner.add();
         }
@@ -415,7 +415,7 @@ function flyingswords(helper, defaults) {
         player.respawn();
         player.plot();
         var i = 0;
-        var stop = defaults.numberOfEnemies;
+        var stop = defaults.levels[currentLevel].numberOfEnemies;
         for (i = 0; i < stop; i += 1) {
             enemySpawner.add();
         }
@@ -530,7 +530,7 @@ function flyingswords(helper, defaults) {
         player.plot();
         // Creating the enemies
         var i = 0;
-        var stopindex = defaults.numberOfEnemies;
+        var stopindex = defaults.levels[currentLevel].numberOfEnemies;
         for (i = 0; i < stopindex; i += 1) {
             enemySpawner.add();
         }
