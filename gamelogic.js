@@ -61,21 +61,21 @@ function flyingswords(helper, defaults) {
         var alive = true;
 
         var movePlayer = function (xDir, yDir) {
-            helper.clearCell(player.position);
-            helper.removeClassForCell("player", player.position);
-            player.position[0] = player.position[0] + xDir;
-            player.position[1] = player.position[1] + yDir;
+            helper.clearCell(position);
+            helper.removeClassForCell("player", position);
+            position[0] = position[0] + xDir;
+            position[1] = position[1] + yDir;
             plot();
         };
 
         var plot = function () {
             // Plot player at given postion (updated by .move) and kill if collided
-            var currentPos = "x" + player.position[0] + "y" + player.position[1];
+            var currentPos = "x" + position[0] + "y" + position[1];
             var cell = [];
             cell = document.getElementById(currentPos);
             cell.innerText += "O";
             cell.classList.add("player");
-            if (checkCollision(player.position)) {
+            if (checkCollision(position)) {
                 alive = false;
                 pauseController.pause();
                 cell.classList.add("dead");
@@ -87,11 +87,15 @@ function flyingswords(helper, defaults) {
         };
 
         var respawn = function () {
-            player.position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
+            position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
+        };
+        
+        var reportPosition = function () {
+            return position;
         };
 
         return {
-            position: position,
+            reportPosition: reportPosition,
             alive: alive,
             movePlayer: movePlayer,
             plot: plot,
@@ -147,10 +151,12 @@ function flyingswords(helper, defaults) {
 
         var move = function () {
             if (alive) {
+                console.log(player.reportPosition() + "Player position in enemy move");
+                var playerpos = player.reportPosition();
                 helper.clearCell(enemyPosition);
                 helper.removeClassForCell("enemy", enemyPosition);
-                var directionX = calculateDirection(player.position[0], enemyPosition[0]);
-                var directionY = calculateDirection(player.position[1], enemyPosition[1]);
+                var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
+                var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
                 enemyPosition[0] = enemyPosition[0] + directionX;
                 enemyPosition[1] = enemyPosition[1] + directionY;
             }
@@ -472,22 +478,22 @@ function flyingswords(helper, defaults) {
         if (!pauseController.isPaused()) {
             switch (keycode) {
             case Key.LEFT:
-                if (player.position[0] > 0) {
+                if (player.reportPosition()[0] > 0) {
                     player.movePlayer(-1, 0);
                 }
                 break;
             case Key.UP:
-                if (player.position[1] > 0) {
+                if (player.reportPosition()[1] > 0) {
                     player.movePlayer(0, -1);
                 }
                 break;
             case Key.RIGHT:
-                if (player.position[0] < defaults.xLimit) {
+                if (player.reportPosition()[0] < defaults.xLimit) {
                     player.movePlayer(1, 0);
                 }
                 break;
             case Key.DOWN:
-                if (player.position[1] < defaults.yLimit) {
+                if (player.reportPosition()[1] < defaults.yLimit) {
                     player.movePlayer(0, 1);
                 }
                 break;
@@ -513,7 +519,6 @@ function flyingswords(helper, defaults) {
             spawnlimit = defaults.levels[currentLevel].killsRequired;
         };
         var add = function () {
-            console.log("Spawn limit" + spawnlimit);
             var enemy = "";
             if (spawnlimit > 0) {
                 enemy = basicEnemy();
