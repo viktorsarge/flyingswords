@@ -126,16 +126,18 @@ function flyingswords(helper, defaults) {
         };
     }());
 
-    var createBoss = function () {
+    var boss = function () {
         var alive = true; 
-        var position = [];  // Todo: Assign four spaces
-        
-        var move = function () {};
-        
-        var plot = function () {};
+        var position = [];  // Todo: Handle four spaces
+
+        var move = function () {}; // Todo: Regular move wrapped in a loop? 
+
+        var plot = function () {}; // Todo: Regular plot wrapped in a loop?
+
+        var fire = function () {}; // Todo: When to trigger? 
     };
 
-    var createEnemy = function () {
+    var basicEnemy = function () {
         var alive = true;
         var enemyPosition = putBabyInACorner();
 
@@ -217,9 +219,17 @@ function flyingswords(helper, defaults) {
             kills += 1;
             score.add();
             updateStats();
-            if (kills === defaults.levels[currentLevel].killsRequired) {
+            if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
                 pauseController.pause();
                 delayFunction(levelUp, 1500);
+            } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel === defaults.levels.length) {
+                pauseController.pause();
+                helper.clearAllCells();
+                enemies = [];
+                currentLevel = 0;
+                enemySpawner.resetSpawnlimit();
+                helper.displayText("You win!");
+                delayFunction(gameRestart, 1500);
             }
         };
 
@@ -397,7 +407,7 @@ function flyingswords(helper, defaults) {
         player.respawn();
         player.plot();
         var i = 0;
-        var stop = defaults.levels[currentLevel].numberOfEnemies;
+        var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
             enemySpawner.add();
         }
@@ -415,7 +425,7 @@ function flyingswords(helper, defaults) {
         player.respawn();
         player.plot();
         var i = 0;
-        var stop = defaults.levels[currentLevel].numberOfEnemies;
+        var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
             enemySpawner.add();
         }
@@ -506,7 +516,7 @@ function flyingswords(helper, defaults) {
             console.log("Spawn limit" + spawnlimit);
             var enemy = "";
             if (spawnlimit > 0) {
-                enemy = createEnemy();
+                enemy = basicEnemy();
                 enemy.plot();
                 enemies.push(enemy);
                 spawnlimit -= 1;
@@ -530,7 +540,7 @@ function flyingswords(helper, defaults) {
         player.plot();
         // Creating the enemies
         var i = 0;
-        var stopindex = defaults.levels[currentLevel].numberOfEnemies;
+        var stopindex = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stopindex; i += 1) {
             enemySpawner.add();
         }

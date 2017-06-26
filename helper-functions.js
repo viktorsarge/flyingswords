@@ -78,7 +78,7 @@ function documentModMachine() {
         var i = 0;
         input = input.split("");
         var stop = input.length;
-        var cell = document.getElementsByClassName("y" + Math.floor(defaults.yLimit / 2));
+        var cell = document.getElementsByClassName("y" + Math.floor(defaults.yLimit / 2 - 1));
         var indentation = Math.floor((defaults.xLimit - input.length) / 2) + 1;
         for (i = 0; i < stop; i += 1) {
             cell[i + indentation].innerHTML = input[i];
