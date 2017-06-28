@@ -19,32 +19,6 @@ function flyingswords(helper, defaults) {
         }
     };
 
-    var soundengine = (function () {
-        var musicon = true;
-        var music = new Audio("gamemusic.wav");
-        music.addEventListener("ended", function () {
-            this.currentTime = 0;
-            this.play();
-        }, false);
-
-        var togglePlayback = function () {
-            if (musicon) {
-                music.pause();
-                musicon = false;
-            } else {
-                music.play();
-                musicon = true;
-            }
-        };
-        return {
-            togglePlayback: togglePlayback,
-            musicon: musicon,
-            music: music
-        };
-    }());
-
-    var snd = new Audio("flyingswords-krasch.wav");
-
     var pauseController = (function () {
         var paused = true;
         var clock = "";
@@ -571,13 +545,12 @@ function flyingswords(helper, defaults) {
         }
         placeObstacles();
         pauseController.unpause();
-        soundengine.music.play();
+        soundController.soundengine.music.play();
         updateStats();
     };
 
     return {
         init: init,
-        soundengine: soundengine,
         update: updateStage,
         pauseController: pauseController
     };
