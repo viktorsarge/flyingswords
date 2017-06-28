@@ -116,18 +116,22 @@ function flyingswords(helper, defaults) {
             return coords;
         };
     }());
-/*
+
     var boss = function () {
         var alive = true; 
-        var position = [];  // Todo: Handle four spaces
+        var position = [Math.floor(xLimit / 2-2), 0];  // Gives pos of B in BOSS.  
 
-        var move = function () {}; // Todo: Regular move wrapped in a loop? 
+        var move = function () {
+            if (alive) {
+            
+            }
+        }; // Todo: Regular move wrapped in a loop? 
 
         var plot = function () {}; // Todo: Regular plot wrapped in a loop?
 
         var fire = function () {}; // Todo: When to trigger? 
     };
-*/
+
     var basicEnemy = function () {
         var alive = true;
         var enemyPosition = putBabyInACorner();
@@ -138,7 +142,6 @@ function flyingswords(helper, defaults) {
 
         var move = function () {
             if (alive) {
-                console.log(player.reportPosition() + "Player position in enemy move");
                 var playerpos = player.reportPosition();
                 helper.clearCell(enemyPosition);
                 helper.removeClassForCell("enemy", enemyPosition);
@@ -212,17 +215,11 @@ function flyingswords(helper, defaults) {
             kills += 1;
             score.add();
             updateStats();
-            if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
+            if (kills === defaults.levels[currentLevel].killsRequired && currentLevel === defaults.levels.length-1) {
+                win();
+            } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
                 pauseController.pause();
                 delayFunction(levelUp, 1500);
-            } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel === defaults.levels.length) {
-                pauseController.pause();
-                helper.clearAllCells();
-                enemies = [];
-                currentLevel = 0;
-                enemySpawner.resetSpawnlimit();
-                helper.displayText("You win!");
-                delayFunction(gameRestart, 1500);
             }
         };
 
@@ -395,6 +392,16 @@ function flyingswords(helper, defaults) {
         delayFunction(startLevel, 1500);
     };
 
+    var win = function () {
+        pauseController.pause();
+        helper.clearAllCells();
+        enemies = [];
+        currentLevel = 0; 
+        enemySpawner.resetSpawnlimit();
+        helper.displayText("You win");
+        delayFunction(gameRestart, 1500);
+    };
+
     var startLevel = function () {
         helper.clearAllCells();
         player.respawn();
@@ -501,7 +508,6 @@ function flyingswords(helper, defaults) {
 
     var enemySpawner = (function () {
         var spawnlimit = defaults.levels[currentLevel].killsRequired;
-        console.log("Spawn limit" + spawnlimit);
         var resetSpawnlimit = function () {
             spawnlimit = defaults.levels[currentLevel].killsRequired;
         };
