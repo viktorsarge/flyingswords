@@ -19,16 +19,6 @@ function flyingswords(helper, defaults) {
         }
     };
 
-    var isEmpty = function (coordinates) {
-        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
-        var cell = document.getElementById(currentPos);
-        if (cell.innerText.length > 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-    };
-
     var soundengine = (function () {
         var musicon = true;
         var music = new Audio("gamemusic.wav");
@@ -55,18 +45,33 @@ function flyingswords(helper, defaults) {
 
     var snd = new Audio("flyingswords-krasch.wav");
 
+    var pauseController = (function () {
+        var paused = true;
+        var clock = "";
+        var pause = function () {
+            paused = true;
+            clearInterval(clock);
+            return paused;
+        };
+        var unpause = function () {
+            clock = setInterval(updateStage, defaults.levels[currentLevel].clockSpeed);
+            paused = false;
+            return paused;
+        };
+        var isPaused = function () {
+            return paused;
+        };
+        return {
+            pause: pause,
+            unpause: unpause,
+            isPaused: isPaused
+        };
+    }());
+
     var player = (function () {
 
         var position = defaults.playerPos;
         var alive = true;
-
-        var movePlayer = function (xDir, yDir) {
-            helper.clearCell(position);
-            helper.removeClassForCell("player", position);
-            position[0] = position[0] + xDir;
-            position[1] = position[1] + yDir;
-            plot();
-        };
 
         var plot = function () {
             // Plot player at given postion (updated by .move) and kill if collided
@@ -84,6 +89,14 @@ function flyingswords(helper, defaults) {
                 // Standard syntax
                 cell.addEventListener("animationend", gameOver);
             }
+        };
+
+        var movePlayer = function (xDir, yDir) {
+            helper.clearCell(position);
+            helper.removeClassForCell("player", position);
+            position[0] = position[0] + xDir;
+            position[1] = position[1] + yDir;
+            plot();
         };
 
         var respawn = function () {
@@ -129,7 +142,7 @@ function flyingswords(helper, defaults) {
             return coords;
         };
     }());
-
+/*
     var boss = function () {
         var alive = true; 
         var position = [];  // Todo: Handle four spaces
@@ -140,7 +153,7 @@ function flyingswords(helper, defaults) {
 
         var fire = function () {}; // Todo: When to trigger? 
     };
-
+*/
     var basicEnemy = function () {
         var alive = true;
         var enemyPosition = putBabyInACorner();
@@ -350,7 +363,7 @@ function flyingswords(helper, defaults) {
         if (spec.skipCollisionCheck === true) {
             return coordinates;
         } else {
-            while (!isEmpty(coordinates)) {
+            while (!helper.isEmpty(coordinates)) {
                 coordinates = genCoordinates({skipCollisionCheck: false});
             }
             return coordinates;
@@ -561,29 +574,6 @@ function flyingswords(helper, defaults) {
         soundengine.music.play();
         updateStats();
     };
-    
-    var pauseController = (function () {
-        var paused = true;
-        var clock = "";
-        var pause = function () {
-            paused = true;
-            clearInterval(clock);
-            return paused;
-        };
-        var unpause = function () {
-            clock = setInterval(game.update, defaults.levels[currentLevel].clockSpeed);
-            paused = false;
-            return paused;
-        };
-        var isPaused = function () {
-            return paused; 
-        };
-        return {
-            pause: pause, 
-            unpause: unpause,
-            isPaused: isPaused
-        };
-    }()); 
 
     return {
         init: init,

@@ -1,6 +1,5 @@
 "use strict";
 
-
 // ------------------------------------------------------------------------------ //
 // Some helper functions for mostly document manipulation wrapped in an object    //
 // -------------------------------------------------------------------------------//
@@ -34,6 +33,16 @@ function documentModMachine() {
         var currentPos = "x" + xy[0] + "y" + xy[1];
         var cell = document.getElementById(currentPos);
         cell.innerText = "";
+    };
+
+    var isEmpty = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerText.length > 0) {
+            return 0;
+        } else {
+            return 1;
+        }
     };
 
     var removeClassForCell = function (className, coordinates) {
@@ -106,6 +115,7 @@ function documentModMachine() {
         createBoard: createBoard,
         addClassForCell: addClassForCell,
         clearCell: clearCell,
+        isEmpty: isEmpty,
         removeClassForCell: removeClassForCell,
         clearAllCells: clearAllCells,
         randomIntFromInterval: randomIntFromInterval,
