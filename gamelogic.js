@@ -25,10 +25,14 @@ function flyingswords(helper, defaults) {
         var pause = function () {
             paused = true;
             clearInterval(clock);
+            var cell = document.getElementById("instructions");
+            cell.innerText = defaults.texts.pause;
             return paused;
         };
         var unpause = function () {
             clock = setInterval(updateStage, defaults.levels[currentLevel].clockSpeed);
+            var cell = document.getElementById("instructions");
+            cell.innerText = defaults.texts.instructions;
             paused = false;
             return paused;
         };

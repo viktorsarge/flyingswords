@@ -8,6 +8,10 @@ var defaults = (function () {
     var xLimit = 14;
     var yLimit = 8;
     var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
+    var texts = {
+        pause: "Paused - P to unpause",
+        instructions: "( Use arrow keys to play )"
+    };
     var levels = [
         {
             killsRequired: 4,
@@ -68,6 +72,7 @@ var defaults = (function () {
         xLimit: xLimit,
         yLimit: yLimit,
         playerPos: playerPos,
-        levels: levels
+        levels: levels,
+        texts: texts
     };
 }());
