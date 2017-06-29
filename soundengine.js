@@ -2,7 +2,7 @@
 
 var soundController = function () {
     var soundengine = (function () {
-        var musicon = true;
+        var musicon = false;
         var music = new Audio("gamemusic.wav");
         music.addEventListener("ended", function () {
             this.currentTime = 0;
@@ -26,6 +26,7 @@ var soundController = function () {
     }());
 
     var snd = new Audio("flyingswords-krasch.wav");
+
     return {
         soundengine: soundengine,
         snd: snd

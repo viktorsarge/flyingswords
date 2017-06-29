@@ -574,7 +574,7 @@ function flyingswords(helper, defaults) {
         }
         placeObstacles();
         pauseController.unpause();
-        soundController.soundengine.music.play();
+        //soundController.soundengine.music.play();
         updateStats();
     };
 
