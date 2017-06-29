@@ -1,6 +1,8 @@
 @font-face {
     font-family: 'Vermin';
-    src: url('Vermin_vibes.ttf') format('truetype');
+    src: url('Vermin_vibes.woff2') format('woff2'), /* Super Modern Browsers */
+       url('Vermin_vibes.woff') format('woff'), /* Pretty Modern Browsers */
+       url('Vermin_vibes.ttf') format('truetype');
 }
 
 body {
