@@ -119,40 +119,72 @@ function flyingswords(helper, defaults) {
 
     var boss = function () {
         var alive = true; 
-        var position = [Math.floor(xLimit / 2-2), 0];  // Gives pos of B in BOSS.  
+        var position = [Math.floor(defaults.xLimit / 2-2), 0];  // Gives pos of B in BOSS.  
 
         var move = function () {
+        // Moves the left corner of the boss
             if (alive) {
+                var i = 0;
+                var tempPos = [0,0]
                 var playerpos = player.reportPosition();
-                helper.clearCell(position);
-                helper.removeClassForCell("enemy", position);
+                for (i = 0; i < 4; i += 1) {
+                    tempPos[0] = position[0] + i;
+                    helper.clearCell(tempPos);
+                    helper.removeClassForCell("enemy", tempPos);
+                }
+
                 var directionX = calculateDirection(playerpos[0], position[0]);
-                var directionY = calculateDirection(playerpos[1], position[1]);
+                // var directionY = calculateDirection(playerpos[1], position[1]);
                 position[0] = position[0] + directionX;
-                position[1] = position[1] + directionY;
+                // position[1] = position[1] + directionY;
             }
-        }; // Moves the left corner of the boss
+        }; 
+
+        var calculateDirection = function (player, enemy) {
+        // Follow only in X direction
+            var direction = 0;
+            if (player > enemy) {
+                direction = 1;
+                return direction;
+            } else if (player < enemy) {
+                direction = -1;
+                return direction;
+            } else {
+                return direction;
+            }
+        };
 
         var plot = function () {
             var cell = "";
             if (alive) {
-                var currentPos = "x" + position[0] + " y" + position[1];
-                cell = document.getElementById(currentPos);
+                // TODO: Tidy up this part
+                var currentPos = ""; // "x" + position[0] + "y" + position[1];
+                cell = document.getElementById("x" + position[0] + "y" + position[1]);
                 cell.innerHTML += "B";
                 cell.classList.add("enemy");
-                cell = document.getElementById(currentPos+1);
+                cell = document.getElementById("x" + (position[0] + 1) + "y" + position[1]);
                 cell.innerHTML += "O";
                 cell.classList.add("enemy");
-                cell = document.getElementById(currentPos+2);
+                cell = document.getElementById("x" + (position[0] + 2) + "y" + position[1]);
                 cell.innerHTML += "S";
                 cell.classList.add("enemy");
-                cell = document.getElementById(currentPos+3);
+                cell = document.getElementById("x" + (position[0] + 3) + "y" + position[1]);
                 cell.innerHTML += "S";
                 cell.classList.add("enemy");
             } 
-        }; // Todo: Tidy up this part
+        }; 
 
         var fire = function () {}; // Todo: When to trigger? 
+        
+        var reportAliveStatus = function () {
+            return alive;
+        };
+
+        return {
+            move: move,
+            plot: plot,
+            reportAliveStatus: reportAliveStatus
+        };
     };
 
     var basicEnemy = function () {
@@ -531,6 +563,7 @@ function flyingswords(helper, defaults) {
 
     var enemySpawner = (function () {
         var spawnlimit = defaults.levels[currentLevel].killsRequired;
+        
         var resetSpawnlimit = function () {
             spawnlimit = defaults.levels[currentLevel].killsRequired;
         };
@@ -538,6 +571,7 @@ function flyingswords(helper, defaults) {
             var enemy = "";
             if (spawnlimit > 0) {
                 enemy = basicEnemy();
+                //enemy = basicEnemy();
                 enemy.plot();
                 enemies.push(enemy);
                 spawnlimit -= 1;
