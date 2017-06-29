@@ -123,11 +123,34 @@ function flyingswords(helper, defaults) {
 
         var move = function () {
             if (alive) {
-            
+                var playerpos = player.reportPosition();
+                helper.clearCell(position);
+                helper.removeClassForCell("enemy", position);
+                var directionX = calculateDirection(playerpos[0], position[0]);
+                var directionY = calculateDirection(playerpos[1], position[1]);
+                position[0] = position[0] + directionX;
+                position[1] = position[1] + directionY;
             }
-        }; // Todo: Regular move wrapped in a loop? 
+        }; // Moves the left corner of the boss
 
-        var plot = function () {}; // Todo: Regular plot wrapped in a loop?
+        var plot = function () {
+            var cell = "";
+            if (alive) {
+                var currentPos = "x" + position[0] + " y" + position[1];
+                cell = document.getElementById(currentPos);
+                cell.innerHTML += "B";
+                cell.classList.add("enemy");
+                cell = document.getElementById(currentPos+1);
+                cell.innerHTML += "O";
+                cell.classList.add("enemy");
+                cell = document.getElementById(currentPos+2);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+                cell = document.getElementById(currentPos+3);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+            } 
+        }; // Todo: Tidy up this part
 
         var fire = function () {}; // Todo: When to trigger? 
     };
