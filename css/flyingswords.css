@@ -1,8 +1,8 @@
 @font-face {
     font-family: 'Vermin';
-    src: url('vermin_vibes.woff2') format('woff2'), /* Super Modern Browsers */
-       url('vermin_vibes.woff') format('woff'), /* Pretty Modern Browsers */
-       url('vermin_vibes.ttf') format('truetype');
+    src: url('../fonts/vermin_vibes.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/vermin_vibes.woff') format('woff'), /* Pretty Modern Browsers */
+       url('../fonts/vermin_vibes.ttf') format('truetype');
 }
 
 body {
