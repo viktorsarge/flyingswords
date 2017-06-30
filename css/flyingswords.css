@@ -21,6 +21,11 @@ body {
     background-color: #91ce69;
 }
 
+.shieldEquiped {
+    animation: colorchange 4s;
+    animation-iteration-count: infinite;
+}
+
 .gamecontainer {
     text-align:center;
 }
@@ -101,6 +106,13 @@ td {
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }    
+
+@keyframes colorchange {
+      0%   {background: #44B3C2;}
+      25%  {background: #91ce69;}
+      75%  {background: #91ce69;}
+      100% {background: #44B3C2;}
+}
 
 @keyframes rotatingForever {
     0%    {

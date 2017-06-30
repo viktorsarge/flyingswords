@@ -22,11 +22,13 @@ function flyingswords(helper, defaults) {
     var pauseController = (function () {
         var paused = true;
         var clock = "";
-        var pause = function () {
+        var pause = function (playerTriggered) {
             paused = true;
             clearInterval(clock);
+            if (typeof playerTriggered != "undefined") {
             var cell = document.getElementById("instructions");
             cell.innerText = defaults.texts.pause;
+            }
             return paused;
         };
         var unpause = function () {
@@ -80,12 +82,12 @@ function flyingswords(helper, defaults) {
                 equiped = true;
                 shield += 3;
                 identifier = "0";
-                
             }; 
 
             var broken = function () {
                 equiped = false; 
                 identifier = "O";
+                placeShield();
             }
             return {
                 equip: equip,
@@ -102,22 +104,28 @@ function flyingswords(helper, defaults) {
             var moveToId = "x" + (position[0] + direction[0]) + "y" + (position[1] + direction[1]);
             var cell = [];
             var nextCell = "";
-            //var celltext = "";
             cell = document.getElementById(currentPos);
             cell.innerText += identifier;
             cell.classList.add("player");
-            //celltext = cell.innerHTML;
+            if (shieldhandler.isEquiped()) {
+                cell.classList.add("shieldEquiped");
+            }
             if (checkCollision(position)) {
                 if (cell.innerHTML.indexOf("0") >= 0 && !shieldhandler.isEquiped()) {
+                    // Picking up a shield
                     shieldhandler.equip();
                     cell.classList.remove("shield");
                     console.log("Shield equiped. Strength: " + shield);
                 } else if (cell.innerHTML.indexOf("X") === 0 && shieldhandler.isEquiped()) {
+                    // Colliding with an obstacle while equiped with shield
                     nextCell = document.getElementById(moveToId);
                     nextCell.innerHTML += "X";
+                    nextCell.classList.add("obstacle");
+                    cell.classList.remove("obstacle");
                     cell.innerHTML -= "X";
                     shieldhandler.decrease();
                 } else {
+                    // Standard case - without a shield any collision is fatar
                     alive = false;
                     pauseController.pause();
                     cell.classList.add("dead");
@@ -133,6 +141,7 @@ function flyingswords(helper, defaults) {
             direction = [xDir, yDir];
             helper.clearCell(position);
             helper.removeClassForCell("player", position);
+            helper.removeClassForCell("shieldEquiped", position);
             position[0] = position[0] + xDir;
             position[1] = position[1] + yDir;
             plot();
@@ -546,9 +555,11 @@ function flyingswords(helper, defaults) {
         placeShield();
         updateStats();
         pauseController.unpause();
+        console.log("Done with startLevel function");
     };
 
     var gameRestart = function () {
+        console.log("In gameRestart");
         score.reset();
         currentLevel = 0;
         kills = 0;
@@ -556,6 +567,7 @@ function flyingswords(helper, defaults) {
         player.alive = true;
         player.respawn();
         player.plot();
+                pauseController.unpause();
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
@@ -566,6 +578,7 @@ function flyingswords(helper, defaults) {
         score.reset();
         updateStage();
         pauseController.unpause();
+        console.log("Restarted game");
     };
 
     var updateStage = function () {
@@ -628,7 +641,7 @@ function flyingswords(helper, defaults) {
                 if (pauseController.isPaused()) {
                     pauseController.unpause();
                 } else {
-                    pauseController.pause();
+                    pauseController.pause({byPlayer: true});
                 }
                 break;
             }
