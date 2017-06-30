@@ -119,10 +119,14 @@ function flyingswords(helper, defaults) {
                 } else if (cell.innerHTML.indexOf("X") === 0 && shieldhandler.isEquiped()) {
                     // Colliding with an obstacle while equiped with shield
                     nextCell = document.getElementById(moveToId);
+                    if (nextCell.innerText.length === 0) {
                     nextCell.innerHTML += "X";
                     nextCell.classList.add("obstacle");
                     cell.classList.remove("obstacle");
                     cell.innerHTML -= "X";
+                    } else {
+                        // TODO - invert the move to by * -1 and move the player back. 
+                    }
                     shieldhandler.decrease();
                 } else {
                     // Standard case - without a shield any collision is fatar
