@@ -63,6 +63,7 @@ function documentModMachine() {
         var i = 0;
         for (i = 0; i < allCells.length; i += 1) {
             allCells[i].innerText = "";
+            allCells[i].classList.remove("shield");
             allCells[i].classList.remove("enemy");
             allCells[i].classList.remove("obstacle");
             allCells[i].classList.remove("player");

@@ -17,6 +17,10 @@ body {
     width: 50%;
 }
 
+.shield {
+    background-color: #91ce69;
+}
+
 .gamecontainer {
     text-align:center;
 }

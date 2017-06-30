@@ -47,29 +47,90 @@ function flyingswords(helper, defaults) {
     }());
 
     var player = (function () {
-
+        var direction = [];
+        var identifier = "O";
         var position = defaults.playerPos;
         var alive = true;
+        var shield = 0;
+        var shieldhandler = function () {
+            var equiped = false;
+            var increase = function (amount) {
+                if (typeof amount === "undefined") {
+                    amount = 1;
+                }
+                shield += amount;
+            };
+            
+            var decrease = function (amount) {
+                if (typeof amount === "undefined") {
+                    amount = 1;
+                }
+                shield -= amount;
+                if (shield < 1) {
+                    broken();
+                }
+                console.log("Shield decreased to: " + shield);
+            };
+            
+            var isEquiped = function () {
+                return equiped;
+            };
+            
+            var equip = function () {
+                equiped = true;
+                shield += 3;
+                identifier = "0";
+                
+            }; 
+
+            var broken = function () {
+                equiped = false; 
+                identifier = "O";
+            }
+            return {
+                equip: equip,
+                isEquiped: isEquiped,
+                decrease: decrease,
+                increase: increase,
+                broken: broken
+            }
+        }();
 
         var plot = function () {
             // Plot player at given postion (updated by .move) and kill if collided
             var currentPos = "x" + position[0] + "y" + position[1];
+            var moveToId = "x" + (position[0] + direction[0]) + "y" + (position[1] + direction[1]);
             var cell = [];
+            var nextCell = "";
+            //var celltext = "";
             cell = document.getElementById(currentPos);
-            cell.innerText += "O";
+            cell.innerText += identifier;
             cell.classList.add("player");
+            //celltext = cell.innerHTML;
             if (checkCollision(position)) {
-                alive = false;
-                pauseController.pause();
-                cell.classList.add("dead");
-                // Code for Chrome, Safari and Opera
-                cell.addEventListener("webkitAnimationEnd", gameOver);
-                // Standard syntax
-                cell.addEventListener("animationend", gameOver);
+                if (cell.innerHTML.indexOf("0") >= 0 && !shieldhandler.isEquiped()) {
+                    shieldhandler.equip();
+                    cell.classList.remove("shield");
+                    console.log("Shield equiped. Strength: " + shield);
+                } else if (cell.innerHTML.indexOf("X") === 0 && shieldhandler.isEquiped()) {
+                    nextCell = document.getElementById(moveToId);
+                    nextCell.innerHTML += "X";
+                    cell.innerHTML -= "X";
+                    shieldhandler.decrease();
+                } else {
+                    alive = false;
+                    pauseController.pause();
+                    cell.classList.add("dead");
+                    // Code for Chrome, Safari and Opera
+                    cell.addEventListener("webkitAnimationEnd", gameOver);
+                    // Standard syntax
+                    cell.addEventListener("animationend", gameOver);
+                }
             }
         };
 
         var movePlayer = function (xDir, yDir) {
+            direction = [xDir, yDir];
             helper.clearCell(position);
             helper.removeClassForCell("player", position);
             position[0] = position[0] + xDir;
@@ -79,6 +140,7 @@ function flyingswords(helper, defaults) {
 
         var respawn = function () {
             position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
+            shieldhandler.broken();
         };
         
         var reportPosition = function () {
@@ -90,7 +152,8 @@ function flyingswords(helper, defaults) {
             alive: alive,
             movePlayer: movePlayer,
             plot: plot,
-            respawn: respawn
+            respawn: respawn,
+            shield: shield
         };
     }());
 
@@ -137,7 +200,7 @@ function flyingswords(helper, defaults) {
                     helper.removeClassForCell("enemy", tempPos);
                 }
 
-                var directionX = calculateDirection(playerpos[0], position[0]);
+                var directionX = calculateDirection((playerpos[0]-1), position[0]);
                 // var directionY = calculateDirection(playerpos[1], position[1]);
                 position[0] = position[0] + directionX;
                 // position[1] = position[1] + directionY;
@@ -419,6 +482,15 @@ function flyingswords(helper, defaults) {
         return coordinates;
     };
 
+    var placeShield = function () {
+        var coordinates = generateCoordinates({skipCollisionCheck: false});
+        var id = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(id);
+        cell.innerHTML = "0";
+        cell.classList.add("shield");
+    };
+    
+
         function delayFunction(toCall, time) {
         setTimeout(function () {
             toCall();
@@ -471,6 +543,7 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
+        placeShield();
         updateStats();
         pauseController.unpause();
     };
@@ -489,6 +562,7 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
+        placeShield();
         score.reset();
         updateStage();
         pauseController.unpause();
@@ -574,8 +648,8 @@ function flyingswords(helper, defaults) {
         var add = function () {
             var enemy = "";
             if (spawnlimit > 0) {
-                enemy = basicEnemy();
                 //enemy = basicEnemy();
+                enemy = boss();
                 enemy.plot();
                 enemies.push(enemy);
                 spawnlimit -= 1;
@@ -611,6 +685,7 @@ function flyingswords(helper, defaults) {
             enemies[i].plot();
         }
         placeObstacles();
+        placeShield();
         pauseController.unpause();
         //soundController.soundengine.music.play();
         updateStats();
