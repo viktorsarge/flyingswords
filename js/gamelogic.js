@@ -9,6 +9,16 @@ function flyingswords(helper, defaults) {
     var kills = 0;
     var enemies = [];
 
+    var uniqueId = function () {
+        var id = 0;
+        var create = function () {
+            return id += 1;
+        };
+        return {
+            create: create
+        }
+    };
+
     var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
         var cell = document.getElementById(currentPos);
