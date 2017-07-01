@@ -123,7 +123,7 @@ function flyingswords(helper, defaults) {
                     nextCell.innerHTML += "X";
                     nextCell.classList.add("obstacle");
                     cell.classList.remove("obstacle");
-                    cell.innerHTML -= "X";
+                    cell.innerHTML = cell.innerHTML.replace("X", "");
                     } else {
                         // TODO - invert the move to by * -1 and move the player back. 
                     }
