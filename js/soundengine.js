@@ -36,13 +36,3 @@ var soundController = function () {
 
 }();
 
-/*
-var audio_file = new Audio('whatever.mp3')
-audio_file.addEventListener('timeupdate', function(){
-                var buffer = .44
-                if(this.currentTime > this.duration - buffer){
-                    this.currentTime = 0
-                    this.play()
-                }}, false);
-                
-                */
