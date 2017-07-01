@@ -4,7 +4,7 @@
 //  The game object below                                                          //
 //  ------------------------------------------------------------------------------ //
 
-function flyingswords(helper, defaults) {
+function flyingswords() {
     var currentLevel = 0;
     var kills = 0;
     var enemies = [];
@@ -718,6 +718,5 @@ function flyingswords(helper, defaults) {
     };
 }
 
-var helper = documentModMachine();
-var game = flyingswords(helper, defaults);
+var game = flyingswords();
 game.init();

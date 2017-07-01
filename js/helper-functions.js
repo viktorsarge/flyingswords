@@ -4,7 +4,7 @@
 // Some helper functions for mostly document manipulation wrapped in an object    //
 // -------------------------------------------------------------------------------//
 
-function documentModMachine() {
+var helper = (function () {
 
     var createBoard = function () {
     // Appends a HTML table to the container with id #gamecontainer
@@ -119,4 +119,4 @@ function documentModMachine() {
         displayText: displayText,
         getCellsWithContent: getCellsWithContent
     };
-}
+}())
