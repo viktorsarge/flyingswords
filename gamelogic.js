@@ -557,7 +557,6 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
-        placeShield();
         updateStats();
         pauseController.unpause();
         console.log("Done with startLevel function");
@@ -579,7 +578,6 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         placeObstacles();
-        placeShield();
         score.reset();
         updateStage();
         pauseController.unpause();
