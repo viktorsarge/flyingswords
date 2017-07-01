@@ -694,12 +694,6 @@ function flyingswords(helper, defaults) {
             enemySpawner.add();
         }
         addEventListener("keydown", document, handleKeyboardEvent);
-
-        i = 0;
-        var stop = enemies.length;
-        for (i = 0; i < stop; i += 1) {
-            enemies[i].plot();
-        }
         placeObstacles();
         placeShield();
         pauseController.unpause();
