@@ -11,15 +11,11 @@ function documentModMachine() {
     // Takes yLimit and xLimit as input for the table dimensions
         var i = 0;
         var j = 0;
-        //console.log(defaults);
         var snippet = "<table id=\"gamegrid\" class=\"center\">";
-
         for (i = 0; i < defaults.yLimit + 1; i += 1) {
             snippet = snippet + "<tr>";
-            //console.log(i);
             for (j = 0; j < defaults.xLimit + 1; j += 1) {
                 snippet = snippet + "<td id=\"x" + j + "y" + i + "\" class=\"x" + j + " y" + i + "\"></td>";
-                //console.log(i, j);
             }
             snippet = snippet + "</tr>";
         }
