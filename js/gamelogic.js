@@ -91,6 +91,9 @@ function flyingswords() {
             var equip = function () {
                 equiped = true;
                 shield += 3;
+                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                helper.addClassForCell("shieldEquiped", position);
+                cell.innerHTML = cell.innerHTML.replace(identifier, "");
                 identifier = "0";
             }; 
 
@@ -99,6 +102,8 @@ function flyingswords() {
                 identifier = "O";
                 placeShield();
                 helper.removeClassForCell("shieldEquiped", position);
+                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                cell.innerHTML = cell.innerHTML.replace("0", identifier);
             }
             return {
                 equip: equip,
