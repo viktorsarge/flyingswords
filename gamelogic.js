@@ -88,6 +88,7 @@ function flyingswords(helper, defaults) {
                 equiped = false; 
                 identifier = "O";
                 placeShield();
+                helper.removeClassForCell("shieldEquiped", position);
             }
             return {
                 equip: equip,
