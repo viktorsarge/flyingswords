@@ -10,8 +10,12 @@ var defaults = (function () {
     var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
     var texts = {
         pause: "Paused - P to unpause",
-        instructions: "( Use arrow keys to play )"
+        instructions: "( Use arrow keys to play )",
+        gameover: "GAME OVER",
+        levelup: "LEVEL ",
+        win: "YOU WIN!"
     };
+    var defDelay = 1500;
     var levels = [
         {
             killsRequired: 4,

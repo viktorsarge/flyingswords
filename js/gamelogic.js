@@ -81,7 +81,6 @@ function flyingswords() {
                 if (shield < 1) {
                     broken();
                 }
-                console.log("Shield decreased to: " + shield);
             };
             
             var isEquiped = function () {
@@ -370,7 +369,7 @@ function flyingswords() {
                 win();
             } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
                 pauseController.pause();
-                delayFunction(levelUp, 1500);
+                delayFunction(levelUp, defaults.defDelay);
             }
         };
 
@@ -536,8 +535,8 @@ function flyingswords() {
         enemies = [];
         currentLevel = 0;
         enemySpawner.resetSpawnlimit();
-        helper.displayText("GAME OVER");
-        delayFunction(gameRestart, 1500);
+        helper.displayText(defaults.texts.gameover);
+        delayFunction(gameRestart, defaults.defDelay);
     };
 
     var levelUp = function () {
@@ -548,8 +547,8 @@ function flyingswords() {
         levelnumber = currentLevel + 1;
         enemySpawner.resetSpawnlimit();
         enemies = [];
-        helper.displayText("LEVEL " + levelnumber);
-        delayFunction(startLevel, 1500);
+        helper.displayText(defaults.texts.levelup + levelnumber);
+        delayFunction(startLevel, defaults.defDelay);
     };
 
     var win = function () {
@@ -558,8 +557,8 @@ function flyingswords() {
         enemies = [];
         currentLevel = 0; 
         enemySpawner.resetSpawnlimit();
-        helper.displayText("You win");
-        delayFunction(gameRestart, 1500);
+        helper.displayText(defaults.texts.win);
+        delayFunction(gameRestart, defaults.defDelay);
     };
 
     var startLevel = function () {
@@ -574,11 +573,9 @@ function flyingswords() {
         placeObstacles();
         updateStats();
         pauseController.unpause();
-        console.log("Done with startLevel function");
     };
 
     var gameRestart = function () {
-        console.log("In gameRestart");
         score.reset();
         currentLevel = 0;
         kills = 0;
@@ -596,7 +593,6 @@ function flyingswords() {
         score.reset();
         updateStage();
         pauseController.unpause();
-        console.log("Restarted game");
     };
 
     var updateStage = function () {
@@ -702,7 +698,6 @@ function flyingswords() {
     var init = function () {
         helper.createBoard();
         player.plot();
-        // Creating the enemies
         var i = 0;
         var stopindex = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stopindex; i += 1) {
