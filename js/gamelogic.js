@@ -9,397 +9,6 @@ function flyingswords() {
     var kills = 0;
     var enemies = [];
 
-    var uniqueId = function () {
-        var id = 0;
-        var create = function () {
-            return id += 1;
-        };
-        return {
-            create: create
-        }
-    };
-
-    var checkCollision = function (coordinates) {
-        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
-        var cell = document.getElementById(currentPos);
-        if (cell.innerText.length > 1) {
-            return 1;
-        } else {
-            return 0;
-        }
-    };
-
-    var pauseController = (function () {
-        var paused = true;
-        var clock = "";
-        var pause = function (playerTriggered) {
-            paused = true;
-            clearInterval(clock);
-            if (typeof playerTriggered != "undefined") {
-            var cell = document.getElementById("instructions");
-            cell.innerText = defaults.texts.pause;
-            }
-            return paused;
-        };
-        var unpause = function () {
-            clock = setInterval(updateStage, defaults.levels[currentLevel].clockSpeed);
-            var cell = document.getElementById("instructions");
-            cell.innerText = defaults.texts.instructions;
-            paused = false;
-            return paused;
-        };
-        var isPaused = function () {
-            return paused;
-        };
-        return {
-            pause: pause,
-            unpause: unpause,
-            isPaused: isPaused
-        };
-    }());
-
-    var player = (function () {
-        var direction = [];
-        var identifier = "O";
-        var position = defaults.playerPos;
-        var alive = true;
-        var shield = 0;
-        var shieldhandler = function () {
-            var equiped = false;
-            var increase = function (amount) {
-                if (typeof amount === "undefined") {
-                    amount = 1;
-                }
-                shield += amount;
-            };
-            
-            var decrease = function (amount) {
-                if (typeof amount === "undefined") {
-                    amount = 1;
-                }
-                shield -= amount;
-                if (shield < 1) {
-                    broken();
-                }
-            };
-            
-            var isEquiped = function () {
-                return equiped;
-            };
-            
-            var equip = function () {
-                equiped = true;
-                shield += 3;
-                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                helper.addClassForCell("shieldEquiped", position);
-                cell.innerHTML = cell.innerHTML.replace(identifier, "");
-                identifier = "0";
-            }; 
-
-            var broken = function () {
-                equiped = false; 
-                identifier = "O";
-                placeShield();
-                helper.removeClassForCell("shieldEquiped", position);
-                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                cell.innerHTML = cell.innerHTML.replace("0", identifier);
-            }
-            return {
-                equip: equip,
-                isEquiped: isEquiped,
-                decrease: decrease,
-                increase: increase,
-                broken: broken
-            }
-        }();
-
-        var plot = function () {
-            // Plot player at given postion (updated by .move) and kill if collided
-            var currentPos = "x" + position[0] + "y" + position[1];
-            var moveToId = "x" + (position[0] + direction[0]) + "y" + (position[1] + direction[1]);
-            var cell = [];
-            var nextCell = "";
-            cell = document.getElementById(currentPos);
-            cell.innerText += identifier;
-            cell.classList.add("player");
-            if (shieldhandler.isEquiped()) {
-                cell.classList.add("shieldEquiped");
-            }
-            if (checkCollision(position)) {
-                if (cell.innerHTML.indexOf("0") >= 0 && !shieldhandler.isEquiped()) {
-                    // Picking up a shield
-                    shieldhandler.equip();
-                    cell.classList.remove("shield");
-                    console.log("Shield equiped. Strength: " + shield);
-                } else if (cell.innerHTML.indexOf("X") === 0 && shieldhandler.isEquiped()) {
-                    // Colliding with an obstacle while equiped with shield
-                    nextCell = document.getElementById(moveToId);
-                    if (nextCell.innerText.length === 0) {
-                    nextCell.innerHTML += "X";
-                    nextCell.classList.add("obstacle");
-                    cell.classList.remove("obstacle");
-                    cell.innerHTML = cell.innerHTML.replace("X", "");
-                    } else {
-                        // TODO - invert the move to by * -1 and move the player back. 
-                    }
-                    shieldhandler.decrease();
-                } else {
-                    // Standard case - without a shield any collision is fatar
-                    alive = false;
-                    pauseController.pause();
-                    cell.classList.add("dead");
-                    // Code for Chrome, Safari and Opera
-                    cell.addEventListener("webkitAnimationEnd", gameOver);
-                    // Standard syntax
-                    cell.addEventListener("animationend", gameOver);
-                }
-            }
-        };
-
-        var movePlayer = function (xDir, yDir) {
-            direction = [xDir, yDir];
-            helper.clearCell(position);
-            helper.removeClassForCell("player", position);
-            helper.removeClassForCell("shieldEquiped", position);
-            position[0] = position[0] + xDir;
-            position[1] = position[1] + yDir;
-            plot();
-        };
-
-        var respawn = function () {
-            position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
-            shieldhandler.broken();
-        };
-        
-        var reportPosition = function () {
-            return position;
-        };
-
-        return {
-            reportPosition: reportPosition,
-            alive: alive,
-            movePlayer: movePlayer,
-            plot: plot,
-            respawn: respawn,
-            shield: shield
-        };
-    }());
-
-    var putBabyInACorner = (function () {
-    // Returns coordinates of the next corner of the grid at every call
-        var corner = 0;
-        var coords = [];
-        return function () {
-            corner += 1;
-            if (corner === 4) {
-                corner = 0;
-            }
-            switch (corner) {
-            case 0:
-                coords = [0, 0];
-                break;
-            case 1:
-                coords = [0, defaults.yLimit];
-                break;
-            case 2:
-                coords = [defaults.xLimit, defaults.yLimit];
-                break;
-            case 3:
-                coords = [defaults.xLimit, 0];
-                break;
-            }
-            return coords;
-        };
-    }());
-
-    var boss = function () {
-        var alive = true; 
-        var position = [Math.floor(defaults.xLimit / 2-2), 0];  // Gives pos of B in BOSS.  
-
-        var move = function () {
-        // Moves the left corner of the boss
-            if (alive) {
-                var i = 0;
-                var tempPos = [0,0]
-                var playerpos = player.reportPosition();
-                for (i = 0; i < 4; i += 1) {
-                    tempPos[0] = position[0] + i;
-                    helper.clearCell(tempPos);
-                    helper.removeClassForCell("enemy", tempPos);
-                }
-
-                var directionX = calculateDirection((playerpos[0]-1), position[0]);
-                // var directionY = calculateDirection(playerpos[1], position[1]);
-                position[0] = position[0] + directionX;
-                // position[1] = position[1] + directionY;
-            }
-        }; 
-
-        var calculateDirection = function (player, enemy) {
-        // Follow only in X direction
-            var direction = 0;
-            if (player > enemy) {
-                direction = 1;
-                return direction;
-            } else if (player < enemy) {
-                direction = -1;
-                return direction;
-            } else {
-                return direction;
-            }
-        };
-
-        var plot = function () {
-            var cell = "";
-            if (alive) {
-                // TODO: Tidy up this part
-                var currentPos = ""; // "x" + position[0] + "y" + position[1];
-                cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                cell.innerHTML += "B";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 1) + "y" + position[1]);
-                cell.innerHTML += "O";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 2) + "y" + position[1]);
-                cell.innerHTML += "S";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 3) + "y" + position[1]);
-                cell.innerHTML += "S";
-                cell.classList.add("enemy");
-            } 
-        }; 
-
-        var fire = function () {}; // Todo: When to trigger? 
-        
-        var reportAliveStatus = function () {
-            return alive;
-        };
-
-        return {
-            move: move,
-            plot: plot,
-            reportAliveStatus: reportAliveStatus
-        };
-    };
-
-    var basicEnemy = function () {
-        var alive = true;
-        var enemyPosition = putBabyInACorner();
-
-        var reportAliveStatus = function () {
-            return alive;
-        };
-
-        var move = function () {
-            if (alive) {
-                var playerpos = player.reportPosition();
-                helper.clearCell(enemyPosition);
-                helper.removeClassForCell("enemy", enemyPosition);
-                var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
-                var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
-                enemyPosition[0] = enemyPosition[0] + directionX;
-                enemyPosition[1] = enemyPosition[1] + directionY;
-            }
-        };
-
-        var calculateDirection = function (player, enemy) {
-            var direction = 0;
-            if (player > enemy) {
-                direction = 1;
-                return direction;
-            } else if (player < enemy) {
-                direction = -1;
-                return direction;
-            } else {
-                return direction;
-            }
-        };
-
-        var collisioncheck = function () {
-            var currentPos = "x" + enemyPosition[0] + "y" + enemyPosition[1];
-            var cell = document.getElementById(currentPos);
-            if (isPlayer(enemyPosition)) {
-                pauseController.pause();
-                cell.classList.remove("player");
-                cell.classList.remove("enemy");
-                cell.classList.add("dead");
-                // Code for Chrome, Safari and Opera
-                cell.addEventListener("webkitAnimationEnd", gameOver);
-                // Standard syntax
-                cell.addEventListener("animationend", gameOver);
-            } else if (isObstacle(enemyPosition)) {
-                kill();
-                cell.classList.remove("obstacle");
-                cell.classList.add("dead");
-                cell.classList.remove("enemy");
-            } else if (isEnemy(enemyPosition) && cell.innerHTML.length > 1) {
-                kill();
-                cell.innerHTML = "X";
-                helper.addClassForCell("obstacle", enemyPosition);
-                cell.classList.add("dead");
-                cell.classList.remove("enemy");
-                // Code for Chrome, Safari and Opera
-                cell.addEventListener("webkitAnimationEnd", resetObstacle);
-                // Standard syntax
-                cell.addEventListener("animationend", resetObstacle);
-            }
-        };
-
-        var plot = function () {
-            var cell = "";
-            if (reportAliveStatus()) {
-                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
-                cell = document.getElementsByClassName(currentPos);
-                cell[0].innerHTML += "I";
-                cell[0].classList.add("enemy");
-            } 
-        };
-
-        var reportPosition = function () {
-            return enemyPosition;
-        };
-
-        var kill = function () {
-            alive = false;
-            enemySpawner.add();
-            kills += 1;
-            score.add();
-            updateStats();
-            if (kills === defaults.levels[currentLevel].killsRequired && currentLevel === defaults.levels.length-1) {
-                win();
-            } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
-                pauseController.pause();
-                delayFunction(levelUp, defaults.defDelay);
-            }
-        };
-
-        return {
-            reportAliveStatus: reportAliveStatus,
-            kill: kill,
-            alive: alive,
-            enemyPosition: reportPosition,
-            calculateDirection: calculateDirection,
-            collisioncheck: collisioncheck,
-            move: move,
-            plot: plot
-        };
-    };
-
-   /*
-    var cell = function () {
-        var content = [];
-        var add = function (symbol) {
-            content.push(symbol);
-        };
-        var clear = function () {
-            content = [];
-        };
-        return {
-            add: add,
-            clear: clear
-        };
-    };*/
-
 // ------------------------------------------------------------------------------
 //          General game specific helpers
 // ------------------------------------------------------------------------------
@@ -431,7 +40,7 @@ function flyingswords() {
             return 0;
         }
     };
-    
+
     var isEnemy = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
         var cell = document.getElementById(currentPos);
@@ -475,6 +84,62 @@ function flyingswords() {
         this.classList.add("obstacle");
     };
 
+    function delayFunction(toCall, time) {
+        setTimeout(function () {
+            toCall();
+        }, time);
+    }
+
+/*
+    var uniqueId = function () {
+        var id = 0;
+        var create = function () {
+            id += 1;
+            return id;
+        };
+        return {
+            create: create
+        };
+    };
+*/
+
+    var putBabyInACorner = (function () {
+    // Returns coordinates of the next corner of the grid at every call
+        var corner = 0;
+        var coords = [];
+        return function () {
+            corner += 1;
+            if (corner === 4) {
+                corner = 0;
+            }
+            switch (corner) {
+            case 0:
+                coords = [0, 0];
+                break;
+            case 1:
+                coords = [0, defaults.yLimit];
+                break;
+            case 2:
+                coords = [defaults.xLimit, defaults.yLimit];
+                break;
+            case 3:
+                coords = [defaults.xLimit, 0];
+                break;
+            }
+            return coords;
+        };
+    }());
+
+    var checkCollision = function (coordinates) {
+        var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(currentPos);
+        if (cell.innerText.length > 1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    };
+
     var generateCoordinates = function genCoordinates(spec) {
         var xLimit = defaults.xLimit;
         var yLimit = defaults.yLimit;
@@ -489,6 +154,14 @@ function flyingswords() {
             }
             return coordinates;
         }
+    };
+
+    var placeShield = function () {
+        var coordinates = generateCoordinates({skipCollisionCheck: false});
+        var id = "x" + coordinates[0] + "y" + coordinates[1];
+        var cell = document.getElementById(id);
+        cell.innerHTML = "0";
+        cell.classList.add("shield");
     };
 
     var placeObstacles = function () {
@@ -510,20 +183,367 @@ function flyingswords() {
         return coordinates;
     };
 
-    var placeShield = function () {
-        var coordinates = generateCoordinates({skipCollisionCheck: false});
-        var id = "x" + coordinates[0] + "y" + coordinates[1];
-        var cell = document.getElementById(id);
-        cell.innerHTML = "0";
-        cell.classList.add("shield");
+    var updateStage = function () {
+        var i = 0;
+        var stop = enemies.length;
+        for (i = 0; i < stop; i += 1) {
+            if (enemies[i].reportAliveStatus()) {
+                enemies[i].move();
+                enemies[i].plot();
+            }
+        }
+        for (i = 0; i < stop; i += 1) {
+            if (enemies[i].reportAliveStatus()) {
+                enemies[i].collisioncheck();
+            }
+        }
     };
-    
 
-        function delayFunction(toCall, time) {
-        setTimeout(function () {
-            toCall();
-        }, time);
-    }
+    var pauseController = (function () {
+        var paused = true;
+        var clock = "";
+        var pause = function (playerTriggered) {
+            paused = true;
+            clearInterval(clock);
+            if (playerTriggered !== undefined) {
+                var cell = document.getElementById("instructions");
+                cell.innerText = defaults.texts.pause;
+            }
+            return paused;
+        };
+        var unpause = function () {
+            clock = setInterval(updateStage, defaults.levels[currentLevel].clockSpeed);
+            var cell = document.getElementById("instructions");
+            cell.innerText = defaults.texts.instructions;
+            paused = false;
+            return paused;
+        };
+        var isPaused = function () {
+            return paused;
+        };
+        return {
+            pause: pause,
+            unpause: unpause,
+            isPaused: isPaused
+        };
+    }());
+
+    var player = (function () {
+        var direction = [];
+        var identifier = "O";
+        var position = defaults.playerPos;
+        var alive = true;
+        var shield = 0;
+        var shieldhandler = (function () {
+            var equiped = false;
+            var increase = function (amount) {
+                if (amount === undefined) {
+                    amount = 1;
+                }
+                shield += amount;
+            };
+
+            var broken = function () {
+                equiped = false;
+                identifier = "O";
+                placeShield();
+                helper.removeClassForCell("shieldEquiped", position);
+                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                cell.innerHTML = cell.innerHTML.replace("0", identifier);
+            };
+
+            var decrease = function (amount) {
+                if (amount === undefined) {
+                    amount = 1;
+                }
+                shield -= amount;
+                if (shield < 1) {
+                    broken();
+                }
+            };
+
+            var isEquiped = function () {
+                return equiped;
+            };
+
+            var equip = function () {
+                equiped = true;
+                shield += 3;
+                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                helper.addClassForCell("shieldEquiped", position);
+                cell.innerHTML = cell.innerHTML.replace(identifier, "");
+                identifier = "0";
+            };
+
+            return {
+                equip: equip,
+                isEquiped: isEquiped,
+                decrease: decrease,
+                increase: increase,
+                broken: broken
+            };
+        }());
+
+        var plot = function () {
+            // Plot player at given postion (updated by .move) and kill if collided
+            var currentPos = "x" + position[0] + "y" + position[1];
+            var moveToId = "x" + (position[0] + direction[0]) + "y" + (position[1] + direction[1]);
+            var cell = [];
+            var nextCell = "";
+            cell = document.getElementById(currentPos);
+            cell.innerText += identifier;
+            cell.classList.add("player");
+            if (shieldhandler.isEquiped()) {
+                cell.classList.add("shieldEquiped");
+            }
+            if (checkCollision(position)) {
+                if (cell.innerHTML.indexOf("0") >= 0 && !shieldhandler.isEquiped()) {
+                    // Picking up a shield
+                    shieldhandler.equip();
+                    cell.classList.remove("shield");
+                    console.log("Shield equiped. Strength: " + shield);
+                } else if (cell.innerHTML.indexOf("X") === 0 && shieldhandler.isEquiped()) {
+                    // Colliding with an obstacle while equiped with shield
+                    nextCell = document.getElementById(moveToId);
+                    if (nextCell.innerText.length === 0) {
+                        nextCell.innerHTML += "X";
+                        nextCell.classList.add("obstacle");
+                        cell.classList.remove("obstacle");
+                        cell.innerHTML = cell.innerHTML.replace("X", "");
+                    } else {
+                        // TODO - invert the move to by * -1 and move the player back.
+                    }
+                    shieldhandler.decrease();
+                } else {
+                    // Standard case - without a shield any collision is fatar
+                    alive = false;
+                    pauseController.pause();
+                    cell.classList.add("dead");
+                    // Code for Chrome, Safari and Opera
+                    cell.addEventListener("webkitAnimationEnd", gameOver);
+                    // Standard syntax
+                    cell.addEventListener("animationend", gameOver);
+                }
+            }
+        };
+
+        var movePlayer = function (xDir, yDir) {
+            direction = [xDir, yDir];
+            helper.clearCell(position);
+            helper.removeClassForCell("player", position);
+            helper.removeClassForCell("shieldEquiped", position);
+            position[0] = position[0] + xDir;
+            position[1] = position[1] + yDir;
+            plot();
+        };
+
+        var respawn = function () {
+            position = [Math.floor(defaults.xLimit / 2), Math.floor(defaults.yLimit / 2)];
+            shieldhandler.broken();
+        };
+
+        var reportPosition = function () {
+            return position;
+        };
+
+        return {
+            reportPosition: reportPosition,
+            alive: alive,
+            movePlayer: movePlayer,
+            plot: plot,
+            respawn: respawn,
+            shield: shield
+        };
+    }());
+
+    var boss = function () {
+        var alive = true;
+        var position = [Math.floor(defaults.xLimit / 2 - 2), 0];  // Gives pos of B in BOSS.
+
+        var calculateDirection = function (player, enemy) {
+        // Follow only in X direction
+            var direction = 0;
+            if (player > enemy) {
+                direction = 1;
+                return direction;
+            } else if (player < enemy) {
+                direction = -1;
+                return direction;
+            } else {
+                return direction;
+            }
+        };
+
+        var move = function () {
+        // Moves the left corner of the boss
+            if (alive) {
+                var i = 0;
+                var tempPos = [0, 0];
+                var playerpos = player.reportPosition();
+                for (i = 0; i < 4; i += 1) {
+                    tempPos[0] = position[0] + i;
+                    helper.clearCell(tempPos);
+                    helper.removeClassForCell("enemy", tempPos);
+                }
+                var directionX = calculateDirection((playerpos[0] - 1), position[0]);
+                // var directionY = calculateDirection(playerpos[1], position[1]);
+                position[0] = position[0] + directionX;
+                // position[1] = position[1] + directionY;
+            }
+        };
+
+        var plot = function () {
+            var cell = "";
+            if (alive) {
+                // TODO: Tidy up this part
+                var currentPos = ""; // "x" + position[0] + "y" + position[1];
+                cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                cell.innerHTML += "B";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 1) + "y" + position[1]);
+                cell.innerHTML += "O";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 2) + "y" + position[1]);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 3) + "y" + position[1]);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+            }
+        };
+
+        var fire = function () {}; // Todo: When to trigger?
+
+        var reportAliveStatus = function () {
+            return alive;
+        };
+
+        return {
+            move: move,
+            plot: plot,
+            reportAliveStatus: reportAliveStatus
+        };
+    };
+
+    var basicEnemy = function () {
+        var alive = true;
+        var enemyPosition = putBabyInACorner();
+
+        var reportAliveStatus = function () {
+            return alive;
+        };
+
+    var calculateDirection = function (player, enemy) {
+            var direction = 0;
+            if (player > enemy) {
+                direction = 1;
+                return direction;
+            } else if (player < enemy) {
+                direction = -1;
+                return direction;
+            } else {
+                return direction;
+            }
+        };
+
+        var move = function () {
+            if (alive) {
+                var playerpos = player.reportPosition();
+                helper.clearCell(enemyPosition);
+                helper.removeClassForCell("enemy", enemyPosition);
+                var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
+                var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
+                enemyPosition[0] = enemyPosition[0] + directionX;
+                enemyPosition[1] = enemyPosition[1] + directionY;
+            }
+        };
+
+        var kill = function () {
+            alive = false;
+            enemySpawner.add();
+            kills += 1;
+            score.add();
+            updateStats();
+            if (kills === defaults.levels[currentLevel].killsRequired && currentLevel === defaults.levels.length - 1) {
+                win();
+            } else if (kills === defaults.levels[currentLevel].killsRequired && currentLevel <= defaults.levels.length) {
+                pauseController.pause();
+                delayFunction(levelUp, defaults.defDelay);
+            }
+        };
+
+        var collisioncheck = function () {
+            var currentPos = "x" + enemyPosition[0] + "y" + enemyPosition[1];
+            var cell = document.getElementById(currentPos);
+            if (isPlayer(enemyPosition)) {
+                pauseController.pause();
+                cell.classList.remove("player");
+                cell.classList.remove("enemy");
+                cell.classList.add("dead");
+                // Code for Chrome, Safari and Opera
+                cell.addEventListener("webkitAnimationEnd", gameOver);
+                // Standard syntax
+                cell.addEventListener("animationend", gameOver);
+            } else if (isObstacle(enemyPosition)) {
+                kill();
+                cell.classList.remove("obstacle");
+                cell.classList.add("dead");
+                cell.classList.remove("enemy");
+            } else if (isEnemy(enemyPosition) && cell.innerHTML.length > 1) {
+                kill();
+                cell.innerHTML = "X";
+                helper.addClassForCell("obstacle", enemyPosition);
+                cell.classList.add("dead");
+                cell.classList.remove("enemy");
+                // Code for Chrome, Safari and Opera
+                cell.addEventListener("webkitAnimationEnd", resetObstacle);
+                // Standard syntax
+                cell.addEventListener("animationend", resetObstacle);
+            }
+        };
+
+        var plot = function () {
+            var cell = "";
+            if (reportAliveStatus()) {
+                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
+                cell = document.getElementsByClassName(currentPos);
+                cell[0].innerHTML += "I";
+                cell[0].classList.add("enemy");
+            }
+        };
+
+        var reportPosition = function () {
+            return enemyPosition;
+        };
+
+        return {
+            reportAliveStatus: reportAliveStatus,
+            kill: kill,
+            alive: alive,
+            enemyPosition: reportPosition,
+            calculateDirection: calculateDirection,
+            collisioncheck: collisioncheck,
+            move: move,
+            plot: plot
+        };
+    };
+
+   /*
+    var cell = function () {
+        var content = [];
+        var add = function (symbol) {
+            content.push(symbol);
+        };
+        var clear = function () {
+            content = [];
+        };
+        return {
+            add: add,
+            clear: clear
+        };
+    };*/
+
+
 
 // ------------------------------------------------------------------------------
 //          Game logic at most abstract level
@@ -555,7 +575,7 @@ function flyingswords() {
         pauseController.pause();
         helper.clearAllCells();
         enemies = [];
-        currentLevel = 0; 
+        currentLevel = 0;
         enemySpawner.resetSpawnlimit();
         helper.displayText(defaults.texts.win);
         delayFunction(gameRestart, defaults.defDelay);
@@ -583,7 +603,7 @@ function flyingswords() {
         player.alive = true;
         player.respawn();
         player.plot();
-                pauseController.unpause();
+        pauseController.unpause();
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
@@ -593,22 +613,6 @@ function flyingswords() {
         score.reset();
         updateStage();
         pauseController.unpause();
-    };
-
-    var updateStage = function () {
-        var i = 0;
-        var stop = enemies.length;
-        for (i = 0; i < stop; i += 1) {
-            if (enemies[i].reportAliveStatus()) {
-                enemies[i].move();
-                enemies[i].plot();
-            }
-        }
-        for (i = 0; i < stop; i += 1) {
-            if (enemies[i].reportAliveStatus()) {
-                enemies[i].collisioncheck();
-            }
-        }
     };
 
     /**
@@ -660,15 +664,15 @@ function flyingswords() {
                 break;
             }
         } else {
-             if (keycode === 80) {
-                 pauseController.unpause();
-             }
+            if (keycode === 80) {
+                pauseController.unpause();
+            }
         }
     };
 
     var enemySpawner = (function () {
         var spawnlimit = defaults.levels[currentLevel].killsRequired;
-        
+
         var resetSpawnlimit = function () {
             spawnlimit = defaults.levels[currentLevel].killsRequired;
         };
