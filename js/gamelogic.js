@@ -228,6 +228,139 @@ function flyingswords() {
         };
     }());
 
+
+
+
+
+   /*
+    var cell = function () {
+        var content = [];
+        var add = function (symbol) {
+            content.push(symbol);
+        };
+        var clear = function () {
+            content = [];
+        };
+        return {
+            add: add,
+            clear: clear
+        };
+    };*/
+
+
+
+// ------------------------------------------------------------------------------
+//          Game logic at most abstract level
+// ------------------------------------------------------------------------------
+
+    var boss = function () {
+        var alive = true;
+        var position = [Math.floor(defaults.xLimit / 2 - 2), 0];  // Gives pos of B in BOSS.
+
+        var calculateDirection = function (player, enemy) {
+        // Follow only in X direction
+            var direction = 0;
+            if (player > enemy) {
+                direction = 1;
+                return direction;
+            } else if (player < enemy) {
+                direction = -1;
+                return direction;
+            } else {
+                return direction;
+            }
+        };
+
+        var move = function () {
+        // Moves the left corner of the boss
+            if (alive) {
+                var i = 0;
+                var tempPos = [0, 0];
+                var playerpos = player.reportPosition();
+                for (i = 0; i < 4; i += 1) {
+                    tempPos[0] = position[0] + i;
+                    helper.clearCell(tempPos);
+                    helper.removeClassForCell("enemy", tempPos);
+                }
+                var directionX = calculateDirection((playerpos[0] - 1), position[0]);
+                // var directionY = calculateDirection(playerpos[1], position[1]);
+                position[0] = position[0] + directionX;
+                // position[1] = position[1] + directionY;
+            }
+        };
+
+        var plot = function () {
+            var cell = "";
+            if (alive) {
+                // TODO: Tidy up this part
+                var currentPos = ""; // "x" + position[0] + "y" + position[1];
+                cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                cell.innerHTML += "B";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 1) + "y" + position[1]);
+                cell.innerHTML += "O";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 2) + "y" + position[1]);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+                cell = document.getElementById("x" + (position[0] + 3) + "y" + position[1]);
+                cell.innerHTML += "S";
+                cell.classList.add("enemy");
+            }
+        };
+
+        var fire = function () {}; // Todo: When to trigger?
+
+        var reportAliveStatus = function () {
+            return alive;
+        };
+
+        return {
+            move: move,
+            plot: plot,
+            reportAliveStatus: reportAliveStatus
+        };
+    };
+
+    var enemySpawner = (function () {
+        var spawnlimit = defaults.levels[currentLevel].killsRequired;
+
+        var resetSpawnlimit = function () {
+            spawnlimit = defaults.levels[currentLevel].killsRequired;
+        };
+        var add = function () {
+            var enemy = "";
+            if (spawnlimit > 0) {
+                //enemy = basicEnemy();
+                enemy = boss();
+                enemy.plot();
+                enemies.push(enemy);
+                spawnlimit -= 1;
+                return true;
+            } else {
+                return false;
+            }
+        };
+        var remainingEnemies = function () {
+            return spawnlimit;
+        };
+        return {
+            add: add,
+            remainingEnemies: remainingEnemies,
+            resetSpawnlimit: resetSpawnlimit
+        };
+    }());
+
+    var gameOver = function () {
+        pauseController.pause();
+        helper.clearAllCells();
+        enemies = [];
+        currentLevel = 0;
+        enemySpawner.resetSpawnlimit();
+        helper.displayText(defaults.texts.gameover);
+        delayFunction(gameRestart, defaults.defDelay);
+    };
+
     var player = (function () {
         var direction = [];
         var identifier = "O";
@@ -356,73 +489,131 @@ function flyingswords() {
         };
     }());
 
-    var boss = function () {
-        var alive = true;
-        var position = [Math.floor(defaults.xLimit / 2 - 2), 0];  // Gives pos of B in BOSS.
+    var gameRestart = function () {
+        score.reset();
+        currentLevel = 0;
+        kills = 0;
+        helper.clearAllCells();
+        player.alive = true;
+        player.respawn();
+        player.plot();
+        pauseController.unpause();
+        var i = 0;
+        var stop = defaults.levels[currentLevel].simultEnemies;
+        for (i = 0; i < stop; i += 1) {
+            enemySpawner.add();
+        }
+        placeObstacles();
+        score.reset();
+        updateStage();
+        pauseController.unpause();
+    };
 
-        var calculateDirection = function (player, enemy) {
-        // Follow only in X direction
-            var direction = 0;
-            if (player > enemy) {
-                direction = 1;
-                return direction;
-            } else if (player < enemy) {
-                direction = -1;
-                return direction;
-            } else {
-                return direction;
-            }
-        };
+    var startLevel = function () {
+        helper.clearAllCells();
+        player.respawn();
+        player.plot();
+        var i = 0;
+        var stop = defaults.levels[currentLevel].simultEnemies;
+        for (i = 0; i < stop; i += 1) {
+            enemySpawner.add();
+        }
+        placeObstacles();
+        updateStats();
+        pauseController.unpause();
+    };
 
-        var move = function () {
-        // Moves the left corner of the boss
-            if (alive) {
-                var i = 0;
-                var tempPos = [0, 0];
-                var playerpos = player.reportPosition();
-                for (i = 0; i < 4; i += 1) {
-                    tempPos[0] = position[0] + i;
-                    helper.clearCell(tempPos);
-                    helper.removeClassForCell("enemy", tempPos);
+    var levelUp = function () {
+        var levelnumber = 0;
+        kills = 0;
+        helper.clearAllCells();
+        currentLevel += 1;
+        levelnumber = currentLevel + 1;
+        enemySpawner.resetSpawnlimit();
+        enemies = [];
+        helper.displayText(defaults.texts.levelup + levelnumber);
+        delayFunction(startLevel, defaults.defDelay);
+    };
+
+    var win = function () {
+        pauseController.pause();
+        helper.clearAllCells();
+        enemies = [];
+        currentLevel = 0;
+        enemySpawner.resetSpawnlimit();
+        helper.displayText(defaults.texts.win);
+        delayFunction(gameRestart, defaults.defDelay);
+    };
+
+    /**
+    * old IE: attachEvent
+    * Firefox, Chrome, or modern browsers: addEventListener
+    */
+    var addEventListener = function (evt, element, fn) {
+        if (window.addEventListener) {
+            element.addEventListener(evt, fn, false);
+        } else {
+            element.attachEvent("on" + evt, fn);
+        }
+    };
+
+    var handleKeyboardEvent = function (evt) {
+        if (!evt) {
+            evt = window.event;
+        } // for old IE compatible
+        var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
+
+        if (!pauseController.isPaused()) {
+            switch (keycode) {
+            case Key.LEFT:
+                if (player.reportPosition()[0] > 0) {
+                    player.movePlayer(-1, 0);
                 }
-                var directionX = calculateDirection((playerpos[0] - 1), position[0]);
-                // var directionY = calculateDirection(playerpos[1], position[1]);
-                position[0] = position[0] + directionX;
-                // position[1] = position[1] + directionY;
+                break;
+            case Key.UP:
+                if (player.reportPosition()[1] > 0) {
+                    player.movePlayer(0, -1);
+                }
+                break;
+            case Key.RIGHT:
+                if (player.reportPosition()[0] < defaults.xLimit) {
+                    player.movePlayer(1, 0);
+                }
+                break;
+            case Key.DOWN:
+                if (player.reportPosition()[1] < defaults.yLimit) {
+                    player.movePlayer(0, 1);
+                }
+                break;
+            case Key.P:
+                if (pauseController.isPaused()) {
+                    pauseController.unpause();
+                } else {
+                    pauseController.pause({byPlayer: true});
+                }
+                break;
             }
-        };
-
-        var plot = function () {
-            var cell = "";
-            if (alive) {
-                // TODO: Tidy up this part
-                var currentPos = ""; // "x" + position[0] + "y" + position[1];
-                cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                cell.innerHTML += "B";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 1) + "y" + position[1]);
-                cell.innerHTML += "O";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 2) + "y" + position[1]);
-                cell.innerHTML += "S";
-                cell.classList.add("enemy");
-                cell = document.getElementById("x" + (position[0] + 3) + "y" + position[1]);
-                cell.innerHTML += "S";
-                cell.classList.add("enemy");
+        } else {
+            if (keycode === 80) {
+                pauseController.unpause();
             }
-        };
+        }
+    };
 
-        var fire = function () {}; // Todo: When to trigger?
-
-        var reportAliveStatus = function () {
-            return alive;
-        };
-
-        return {
-            move: move,
-            plot: plot,
-            reportAliveStatus: reportAliveStatus
-        };
+    var init = function () {
+        helper.createBoard();
+        player.plot();
+        var i = 0;
+        var stopindex = defaults.levels[currentLevel].simultEnemies;
+        for (i = 0; i < stopindex; i += 1) {
+            enemySpawner.add();
+        }
+        addEventListener("keydown", document, handleKeyboardEvent);
+        placeObstacles();
+        placeShield();
+        pauseController.unpause();
+        //soundController.soundengine.music.play();
+        updateStats();
     };
 
     var basicEnemy = function () {
@@ -433,7 +624,7 @@ function flyingswords() {
             return alive;
         };
 
-    var calculateDirection = function (player, enemy) {
+        var calculateDirection = function (player, enemy) {
             var direction = 0;
             if (player > enemy) {
                 direction = 1;
@@ -526,193 +717,6 @@ function flyingswords() {
             move: move,
             plot: plot
         };
-    };
-
-   /*
-    var cell = function () {
-        var content = [];
-        var add = function (symbol) {
-            content.push(symbol);
-        };
-        var clear = function () {
-            content = [];
-        };
-        return {
-            add: add,
-            clear: clear
-        };
-    };*/
-
-
-
-// ------------------------------------------------------------------------------
-//          Game logic at most abstract level
-// ------------------------------------------------------------------------------
-
-    var gameOver = function () {
-        pauseController.pause();
-        helper.clearAllCells();
-        enemies = [];
-        currentLevel = 0;
-        enemySpawner.resetSpawnlimit();
-        helper.displayText(defaults.texts.gameover);
-        delayFunction(gameRestart, defaults.defDelay);
-    };
-
-    var levelUp = function () {
-        var levelnumber = 0;
-        kills = 0;
-        helper.clearAllCells();
-        currentLevel += 1;
-        levelnumber = currentLevel + 1;
-        enemySpawner.resetSpawnlimit();
-        enemies = [];
-        helper.displayText(defaults.texts.levelup + levelnumber);
-        delayFunction(startLevel, defaults.defDelay);
-    };
-
-    var win = function () {
-        pauseController.pause();
-        helper.clearAllCells();
-        enemies = [];
-        currentLevel = 0;
-        enemySpawner.resetSpawnlimit();
-        helper.displayText(defaults.texts.win);
-        delayFunction(gameRestart, defaults.defDelay);
-    };
-
-    var startLevel = function () {
-        helper.clearAllCells();
-        player.respawn();
-        player.plot();
-        var i = 0;
-        var stop = defaults.levels[currentLevel].simultEnemies;
-        for (i = 0; i < stop; i += 1) {
-            enemySpawner.add();
-        }
-        placeObstacles();
-        updateStats();
-        pauseController.unpause();
-    };
-
-    var gameRestart = function () {
-        score.reset();
-        currentLevel = 0;
-        kills = 0;
-        helper.clearAllCells();
-        player.alive = true;
-        player.respawn();
-        player.plot();
-        pauseController.unpause();
-        var i = 0;
-        var stop = defaults.levels[currentLevel].simultEnemies;
-        for (i = 0; i < stop; i += 1) {
-            enemySpawner.add();
-        }
-        placeObstacles();
-        score.reset();
-        updateStage();
-        pauseController.unpause();
-    };
-
-    /**
-    * old IE: attachEvent
-    * Firefox, Chrome, or modern browsers: addEventListener
-    */
-    var addEventListener = function (evt, element, fn) {
-        if (window.addEventListener) {
-            element.addEventListener(evt, fn, false);
-        } else {
-            element.attachEvent("on" + evt, fn);
-        }
-    };
-
-    var handleKeyboardEvent = function (evt) {
-        if (!evt) {
-            evt = window.event;
-        } // for old IE compatible
-        var keycode = evt.keyCode || evt.which; // also for cross-browser compatible
-
-        if (!pauseController.isPaused()) {
-            switch (keycode) {
-            case Key.LEFT:
-                if (player.reportPosition()[0] > 0) {
-                    player.movePlayer(-1, 0);
-                }
-                break;
-            case Key.UP:
-                if (player.reportPosition()[1] > 0) {
-                    player.movePlayer(0, -1);
-                }
-                break;
-            case Key.RIGHT:
-                if (player.reportPosition()[0] < defaults.xLimit) {
-                    player.movePlayer(1, 0);
-                }
-                break;
-            case Key.DOWN:
-                if (player.reportPosition()[1] < defaults.yLimit) {
-                    player.movePlayer(0, 1);
-                }
-                break;
-            case Key.P:
-                if (pauseController.isPaused()) {
-                    pauseController.unpause();
-                } else {
-                    pauseController.pause({byPlayer: true});
-                }
-                break;
-            }
-        } else {
-            if (keycode === 80) {
-                pauseController.unpause();
-            }
-        }
-    };
-
-    var enemySpawner = (function () {
-        var spawnlimit = defaults.levels[currentLevel].killsRequired;
-
-        var resetSpawnlimit = function () {
-            spawnlimit = defaults.levels[currentLevel].killsRequired;
-        };
-        var add = function () {
-            var enemy = "";
-            if (spawnlimit > 0) {
-                //enemy = basicEnemy();
-                enemy = boss();
-                enemy.plot();
-                enemies.push(enemy);
-                spawnlimit -= 1;
-                return true;
-            } else {
-                return false;
-            }
-        };
-        var remainingEnemies = function () {
-            return spawnlimit;
-        };
-        return {
-            add: add,
-            remainingEnemies: remainingEnemies,
-            resetSpawnlimit: resetSpawnlimit
-        };
-    }());
-
-    var init = function () {
-        helper.createBoard();
-        player.plot();
-        var i = 0;
-        var stopindex = defaults.levels[currentLevel].simultEnemies;
-        for (i = 0; i < stopindex; i += 1) {
-            enemySpawner.add();
-        }
-        addEventListener("keydown", document, handleKeyboardEvent);
-        placeObstacles();
-        placeShield();
-        pauseController.unpause();
-        //soundController.soundengine.music.play();
-        updateStats();
     };
 
     return {
