@@ -90,19 +90,6 @@ function flyingswords() {
         }, time);
     }
 
-/*
-    var uniqueId = function () {
-        var id = 0;
-        var create = function () {
-            id += 1;
-            return id;
-        };
-        return {
-            create: create
-        };
-    };
-*/
-
     var putBabyInACorner = (function () {
     // Returns coordinates of the next corner of the grid at every call
         var corner = 0;
@@ -322,6 +309,123 @@ function flyingswords() {
         };
     };
 
+    // // // ONGOING DEVELOPMENT
+    var uniqueId = (function () {
+        var id = 0;
+        var create = function () {
+            id += 1;
+            return id;
+        };
+        return {
+            create: create
+        };
+    }());
+
+    var entities = (function () {
+        var allEntities = {};
+
+        var spawnEntity = function (type) {
+/*
+            switch (type) {
+            case "basicEnemy":
+                allEntities[uniqueId.create()] = basicEnemy(); // Spawn enemy;
+                break;
+            case "boss":
+                // spawn boss;
+                break;
+            }
+*/
+            allEntities[uniqueId.create()] = type();
+        };
+
+        var despawnEntity = function (id) {
+            delete allEntities[id];
+        };
+
+        return {
+            spawnEntity: spawnEntity,
+            despawnEntity: despawnEntity
+        };
+    }());
+
+    var grid = (function () {
+        var squares = {};
+        var squaresToUpdate = [];
+        var idArrayToUpdate = [];
+
+        var create = function () {
+            var name = "";
+            var i = 0;
+            var j = 0;
+            for (i = 0; i < defaults.yLimit + 1; i += 1) {
+                for (j = 0; j < defaults.xLimit + 1; j += 1) {
+                    name = "x" + j + "y" + i;
+                    squares[name.create()] = cell();
+                }
+            }
+        };
+
+        var idsToUpdate = function () {
+            var i = 0;
+            var j = 0;
+            var cellIds = [];
+            var stopindex = squaresToUpdate.length;
+            idArrayToUpdate = []; // Empty array before appending to it
+            for (i = 0; i < stopindex; i += 1) {
+                cellIds = squaresToUpdate[i] // TODO TODO TODO - How access corect
+                    // TODO - Put the id:s from every square in idArrayToUpdate
+            }
+            squaresToUpdate = []; // Empty array after use
+            return idArrayToUpdate;
+        };
+        return {
+            create: create,
+            idsToUpdate: idsToUpdate
+        };  // TODO - Return the necessary methods in the API
+    }());
+
+    var cell = function () {
+        var inhabitants = [];       // TODO - Array or object?
+
+        var addEntity = function (id) {
+            inhabitants.push(id); // TODO - Add this logic
+            return;
+        };
+
+        var removeEntity = function (id) {
+            var index = inhabitants.indexOf(id);
+            if (index > -1) {
+                inhabitants.splice(index, 1);
+            }
+            return;
+        };
+
+        var isEmpty = function () {
+            if (inhabitants.length > 0) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        var entityIds = function () {
+            return inhabitants;
+        };
+
+        var plot = function () {
+            
+        };
+
+        return {
+            addEntity: addEntity,
+            removeEntity: removeEntity,
+            isEmpty: isEmpty,
+            entityIds: entityIds
+        };
+    };
+
+    // END OF ONGING DEVELOPMENT
+
     var enemySpawner = (function () {
         var spawnlimit = defaults.levels[currentLevel].killsRequired;
 
@@ -341,12 +445,8 @@ function flyingswords() {
                 return false;
             }
         };
-        var remainingEnemies = function () {
-            return spawnlimit;
-        };
         return {
             add: add,
-            remainingEnemies: remainingEnemies,
             resetSpawnlimit: resetSpawnlimit
         };
     }());
