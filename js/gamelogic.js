@@ -335,7 +335,11 @@ function flyingswords() {
                 break;
             }
 */
-            allEntities[uniqueId.create()] = type();
+            console.log("Inside new spawn");
+            console.log("Spawn is: " + type);
+            var id = uniqueId.create();
+            allEntities[id] = type();
+            allEntities[id].plot();
         };
 
         var despawnEntity = function (id) {
@@ -435,8 +439,8 @@ function flyingswords() {
         var add = function () {
             var enemy = "";
             if (spawnlimit > 0) {
-                //enemy = basicEnemy();
-                enemy = boss();
+                enemy = basicEnemy();
+                //enemy = boss();
                 enemy.plot();
                 enemies.push(enemy);
                 spawnlimit -= 1;
@@ -702,11 +706,13 @@ function flyingswords() {
 
     var init = function () {
         helper.createBoard();
+        grid.create();
         player.plot();
         var i = 0;
         var stopindex = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stopindex; i += 1) {
-            enemySpawner.add();
+            //enemySpawner.add();
+            entities.spawnEntity(basicEnemy);
         }
         addEventListener("keydown", document, handleKeyboardEvent);
         placeObstacles();
