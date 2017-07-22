@@ -171,8 +171,30 @@ function flyingswords() {
     };
 
     var updateStage = function () {
+        var toUpdate = entities.living();
         var i = 0;
-        var stop = enemies.length;
+        // console.log("updateStage - length grid.idsToUpdate: " + grid.idsToUpdate() + " " +grid.idsToUpdate().length);
+        var stop = toUpdate.length; // grid.idsToUpdate().length;
+        for (i = 0; i < stop; i += 1) {
+            console.log("toUpdate[i]: " + toUpdate[i]);
+            console.log("entities.all()" + entities.all());
+            console.log("entities.all()[toUpdate[i]]: " + entities.all()[toUpdate[i]]);
+            if (entities.all()[toUpdate[i]].reportAliveStatus()) {
+                entities.all()[toUpdate[i]].move();
+                //entities.all[i].plot();
+            }
+        }
+        
+        grid.plotChanged();
+        /* 
+        for (i = 0; i < stop; i += 1) {
+            if (enemies[i].reportAliveStatus()) {
+                enemies[i].collisioncheck();
+            }
+        }
+        */ 
+        // TODO!! - Replace all of enemies logic with new entities backend
+        /*var stop = enemies.length;
         for (i = 0; i < stop; i += 1) {
             if (enemies[i].reportAliveStatus()) {
                 enemies[i].move();
@@ -183,7 +205,7 @@ function flyingswords() {
             if (enemies[i].reportAliveStatus()) {
                 enemies[i].collisioncheck();
             }
-        }
+        }*/
     };
 
     var pauseController = (function () {
@@ -214,26 +236,6 @@ function flyingswords() {
             isPaused: isPaused
         };
     }());
-
-
-
-
-
-   /*
-    var cell = function () {
-        var content = [];
-        var add = function (symbol) {
-            content.push(symbol);
-        };
-        var clear = function () {
-            content = [];
-        };
-        return {
-            add: add,
-            clear: clear
-        };
-    };*/
-
 
 
 // ------------------------------------------------------------------------------
@@ -320,74 +322,110 @@ function flyingswords() {
             create: create
         };
     }());
+    
+    var grid = (function () {
+        var squares = {};
+        var squaresToUpdate = [];
+        var name = "";
+        var i = 0;
+        var j = 0;
+        for (i = 0; i < defaults.yLimit + 1; i += 1) {
+            for (j = 0; j < defaults.xLimit + 1; j += 1) {
+                name = "x" + j + "y" + i;
+                squares[name] = [];
+            }
+        }
+
+        var addEntity = function (pos, id) {
+            console.log("grid.addEntity: " + pos + " " + id);
+            squares[pos].push(id);              // Add entity to it´s square
+            //if (squaresToUpdate.indexOf(pos) > -1) {
+                squaresToUpdate.push(pos);      // Flag the square as needing update TODO: Redundancy check?
+            //}
+            return;
+        };
+
+        var removeEntity = function (pos, id) {
+            var index = squares[pos].indexOf(id);   // Finding out where in the array of the square the entity id is
+            squares[pos].splice(index, 1);          // Removing the entity id directly in place in entity array of the square
+            squaresToUpdate.push(pos);               // Flag the square as needing update - TODO: Redundancy check?
+            return;
+        };
+
+        var plotChanged = function () {
+            var square = "";
+            var j = 0;
+            var currentSquareID = "";
+            var entityIDs = "";
+            var currentEntity = "";
+            var stopindex = squaresToUpdate.length;  
+            for (i = 0; i < stopindex; i += 1) {    // Iterating over each changed square
+                currentSquareID = squaresToUpdate[i];   // Less complex handle for the current square
+                square = document.getElementById(squaresToUpdate[i]);   // Access to current square in DOM. 
+                square.innerHTML = "";                                  // Cleaning the current square before adding to it
+                for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
+                    entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
+                    currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
+                    square.innerHTML += currentEntity.identifier();  // Adding the character of current entity to the square
+                }
+            }
+            squaresToUpdate = [];  // Cleaning of array of positions with updates before next iteration
+        };
+
+        return {
+            addEntity: addEntity,
+            removeEntity: removeEntity,
+            squares: squares,
+            plotChanged: plotChanged
+        };
+    }());
 
     var entities = (function () {
         var allEntities = {};
+        var alive = [];
+
+        var all = function () {
+            return allEntities;
+        };
+
+        var living = function () {
+            return alive;
+        };
 
         var spawnEntity = function (type) {
-/*
-            switch (type) {
-            case "basicEnemy":
-                allEntities[uniqueId.create()] = basicEnemy(); // Spawn enemy;
-                break;
-            case "boss":
-                // spawn boss;
-                break;
-            }
-*/
-            console.log("Inside new spawn");
-            console.log("Spawn is: " + type);
             var id = uniqueId.create();
-            allEntities[id] = type();
+            allEntities[id] = type(id);
             allEntities[id].plot();
+            console.log("entities.spawnEntity - allEntities[id].enemyPosition(): " + allEntities[id].enemyPosition());
+            var pos = "x" + allEntities[id].enemyPosition()[0] + "y" +  allEntities[id].enemyPosition()[1];
+            grid.addEntity(pos, id);
+            alive.push(id);
+        };
+
+        var despawnAll = function () {
+            allEntities = {};
+            alive = [];
+            return;
         };
 
         var despawnEntity = function (id) {
             delete allEntities[id];
+            var index = arr.indexOf(id);
+            alive.splice(index,1);
         };
 
         return {
             spawnEntity: spawnEntity,
-            despawnEntity: despawnEntity
+            despawnEntity: despawnEntity,
+            despawnAll: despawnAll,
+            all: all,
+            living: living
         };
     }());
 
-    var grid = (function () {
-        var squares = {};
-        var squaresToUpdate = [];
-        var idArrayToUpdate = [];
 
-        var create = function () {
-            var name = "";
-            var i = 0;
-            var j = 0;
-            for (i = 0; i < defaults.yLimit + 1; i += 1) {
-                for (j = 0; j < defaults.xLimit + 1; j += 1) {
-                    name = "x" + j + "y" + i;
-                    squares[name.create()] = cell();
-                }
-            }
-        };
 
-        var idsToUpdate = function () {
-            var i = 0;
-            var j = 0;
-            var cellIds = [];
-            var stopindex = squaresToUpdate.length;
-            idArrayToUpdate = []; // Empty array before appending to it
-            for (i = 0; i < stopindex; i += 1) {
-                cellIds = squaresToUpdate[i] // TODO TODO TODO - How access corect
-                    // TODO - Put the id:s from every square in idArrayToUpdate
-            }
-            squaresToUpdate = []; // Empty array after use
-            return idArrayToUpdate;
-        };
-        return {
-            create: create,
-            idsToUpdate: idsToUpdate
-        };  // TODO - Return the necessary methods in the API
-    }());
-
+     /* 
     var cell = function () {
         var inhabitants = [];       // TODO - Array or object?
 
@@ -427,6 +465,7 @@ function flyingswords() {
             entityIds: entityIds
         };
     };
+    */
 
     // END OF ONGING DEVELOPMENT
 
@@ -605,7 +644,8 @@ function flyingswords() {
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
-            enemySpawner.add();
+            //enemySpawner.add();
+            entities.spawnEntity(basicEnemy);
         }
         placeObstacles();
         score.reset();
@@ -620,7 +660,8 @@ function flyingswords() {
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
-            enemySpawner.add();
+            //enemySpawner.add();
+            entities.spawnEntity(basicEnemy); 
         }
         placeObstacles();
         updateStats();
@@ -633,8 +674,9 @@ function flyingswords() {
         helper.clearAllCells();
         currentLevel += 1;
         levelnumber = currentLevel + 1;
-        enemySpawner.resetSpawnlimit();
-        enemies = [];
+        //enemySpawner.resetSpawnlimit();  // TODO - Replace this! 
+//        enemies = [];
+        entities.despawnAll();
         helper.displayText(defaults.texts.levelup + levelnumber);
         delayFunction(startLevel, defaults.defDelay);
     };
@@ -642,9 +684,10 @@ function flyingswords() {
     var win = function () {
         pauseController.pause();
         helper.clearAllCells();
-        enemies = [];
+        // enemies = [];
+        entities.despawnAll();
         currentLevel = 0;
-        enemySpawner.resetSpawnlimit();
+        //enemySpawner.resetSpawnlimit();    // TODO - replace this if necessary! 
         helper.displayText(defaults.texts.win);
         delayFunction(gameRestart, defaults.defDelay);
     };
@@ -706,7 +749,7 @@ function flyingswords() {
 
     var init = function () {
         helper.createBoard();
-        grid.create();
+        //grid.create();
         player.plot();
         var i = 0;
         var stopindex = defaults.levels[currentLevel].simultEnemies;
@@ -722,8 +765,14 @@ function flyingswords() {
         updateStats();
     };
 
-    var basicEnemy = function () {
+    var basicEnemy = function (id) {
+        var myGlobalId = id;
         var alive = true;
+        var identifyingCharacter = "I";
+
+        var identifier = function () { 
+            return identifyingCharacter
+        };
         var enemyPosition = putBabyInACorner();
 
         var reportAliveStatus = function () {
@@ -746,12 +795,14 @@ function flyingswords() {
         var move = function () {
             if (alive) {
                 var playerpos = player.reportPosition();
-                helper.clearCell(enemyPosition);
+                grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); //helper.clearCell(enemyPosition);
                 helper.removeClassForCell("enemy", enemyPosition);
                 var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
                 var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
                 enemyPosition[0] = enemyPosition[0] + directionX;
                 enemyPosition[1] = enemyPosition[1] + directionY;
+                grid.addEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId);
+                console.log("in basic enemy move");
             }
         };
 
@@ -821,14 +872,16 @@ function flyingswords() {
             calculateDirection: calculateDirection,
             collisioncheck: collisioncheck,
             move: move,
-            plot: plot
+            plot: plot,
+            identifier: identifier
         };
     };
 
     return {
         init: init,
         update: updateStage,
-        pauseController: pauseController
+        pauseController: pauseController,
+        grid: grid
     };
 }
 
