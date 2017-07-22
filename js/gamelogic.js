@@ -425,50 +425,6 @@ function flyingswords() {
         };
     }());
 
-
-
-     /* 
-    var cell = function () {
-        var inhabitants = [];       // TODO - Array or object?
-
-        var addEntity = function (id) {
-            inhabitants.push(id); // TODO - Add this logic
-            return;
-        };
-
-        var removeEntity = function (id) {
-            var index = inhabitants.indexOf(id);
-            if (index > -1) {
-                inhabitants.splice(index, 1);
-            }
-            return;
-        };
-
-        var isEmpty = function () {
-            if (inhabitants.length > 0) {
-                return false;
-            } else {
-                return true;
-            }
-        };
-
-        var entityIds = function () {
-            return inhabitants;
-        };
-
-        var plot = function () {
-            
-        };
-
-        return {
-            addEntity: addEntity,
-            removeEntity: removeEntity,
-            isEmpty: isEmpty,
-            entityIds: entityIds
-        };
-    };
-    */
-
     // END OF ONGING DEVELOPMENT
 
     var enemySpawner = (function () {
