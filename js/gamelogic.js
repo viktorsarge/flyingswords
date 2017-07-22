@@ -173,39 +173,13 @@ function flyingswords() {
     var updateStage = function () {
         var toUpdate = entities.living();
         var i = 0;
-        // console.log("updateStage - length grid.idsToUpdate: " + grid.idsToUpdate() + " " +grid.idsToUpdate().length);
-        var stop = toUpdate.length; // grid.idsToUpdate().length;
+        var stop = toUpdate.length;
         for (i = 0; i < stop; i += 1) {
-            console.log("toUpdate[i]: " + toUpdate[i]);
-            console.log("entities.all()" + entities.all());
-            console.log("entities.all()[toUpdate[i]]: " + entities.all()[toUpdate[i]]);
-            if (entities.all()[toUpdate[i]].reportAliveStatus()) {
+            if (entities.all()[toUpdate[i]].reportAliveStatus()) {  // TODO: Redundant check? living() already picks out alive entities
                 entities.all()[toUpdate[i]].move();
-                //entities.all[i].plot();
             }
         }
-        
         grid.plotChanged();
-        /* 
-        for (i = 0; i < stop; i += 1) {
-            if (enemies[i].reportAliveStatus()) {
-                enemies[i].collisioncheck();
-            }
-        }
-        */ 
-        // TODO!! - Replace all of enemies logic with new entities backend
-        /*var stop = enemies.length;
-        for (i = 0; i < stop; i += 1) {
-            if (enemies[i].reportAliveStatus()) {
-                enemies[i].move();
-                enemies[i].plot();
-            }
-        }
-        for (i = 0; i < stop; i += 1) {
-            if (enemies[i].reportAliveStatus()) {
-                enemies[i].collisioncheck();
-            }
-        }*/
     };
 
     var pauseController = (function () {
