@@ -339,16 +339,18 @@ function flyingswords() {
         var addEntity = function (pos, id) {
             console.log("grid.addEntity: " + pos + " " + id);
             squares[pos].push(id);              // Add entity to it´s square
-            //if (squaresToUpdate.indexOf(pos) > -1) {
-                squaresToUpdate.push(pos);      // Flag the square as needing update TODO: Redundancy check?
-            //}
+            if (squaresToUpdate.indexOf(pos) === -1) {
+                squaresToUpdate.push(pos);      // Flag the square as needing update if not already flagged
+            }
             return;
         };
 
         var removeEntity = function (pos, id) {
             var index = squares[pos].indexOf(id);   // Finding out where in the array of the square the entity id is
             squares[pos].splice(index, 1);          // Removing the entity id directly in place in entity array of the square
-            squaresToUpdate.push(pos);               // Flag the square as needing update - TODO: Redundancy check?
+            if (squaresToUpdate.indexOf(pos) === -1) {
+                squaresToUpdate.push(pos);      // Flag the square as needing update if not already flagged
+            }
             return;
         };
 
