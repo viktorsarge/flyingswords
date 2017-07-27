@@ -143,16 +143,8 @@ function flyingswords() {
         }
     };
 
-    var placeShield = function () {
-        var coordinates = generateCoordinates({skipCollisionCheck: false});
-        var id = "x" + coordinates[0] + "y" + coordinates[1];
-        var cell = document.getElementById(id);
-        cell.innerHTML = "0";
-        cell.classList.add("shield");
-    };
-
     var placeObstacles = function () {
-        var i = 0;
+        var i = 0;/*
         var coordinates = [];
         var pos = "";
         var cell = [];
@@ -167,7 +159,11 @@ function flyingswords() {
             cell.addEventListener("webkitAnimationEnd", resetObstacle); // Chrome, Safari, opera
             cell.addEventListener("animationend", resetObstacle);  // Standard syntax
         }
-        return coordinates;
+        return coordinates;*/
+        var stopindex = defaults.levels[currentLevel].numberOfObstacles;
+        for (i = 0; i < stopindex; i += 1) {
+            entities.spawnEntity(obstacle);
+        }
     };
 
     var updateStage = function () {
@@ -175,9 +171,7 @@ function flyingswords() {
         var i = 0;
         var stop = toUpdate.length;
         for (i = 0; i < stop; i += 1) {
-            //if (entities.all()[toUpdate[i]].alive()) {  // TODO: Redundant check? living() already picks out alive entities
                 entities.all()[toUpdate[i]].move();
-           // }
         }
         grid.plotChanged();
     };
@@ -419,7 +413,7 @@ function flyingswords() {
 
     // END OF ONGING DEVELOPMENT
 
-    var enemySpawner = (function () {
+/*    var enemySpawner = (function () {
         var spawnlimit = defaults.levels[currentLevel].killsRequired;
 
         var resetSpawnlimit = function () {
@@ -443,7 +437,7 @@ function flyingswords() {
             resetSpawnlimit: resetSpawnlimit
         };
     }());
-
+*/
     var gameOver = function () {
         pauseController.pause();
         helper.clearAllCells();
@@ -512,7 +506,7 @@ function flyingswords() {
             };
         }());
 
-        var plot = function () {
+/*        var plot = function () {
             // Plot player at given postion (updated by .move) and kill if collided
             var currentPos = "x" + position[0] + "y" + position[1];
             var moveToId = "x" + (position[0] + direction[0]) + "y" + (position[1] + direction[1]);
@@ -553,7 +547,7 @@ function flyingswords() {
                     cell.addEventListener("animationend", gameOver);
                 }
             }
-        };
+        }; */ 
 
         var movePlayer = function (xDir, yDir) {
             if (xDir === undefined) {
@@ -599,7 +593,7 @@ function flyingswords() {
             position: reportPosition,
             reportAliveStatus: reportAliveStatus,
             move: movePlayer,
-            plot: plot,
+//          plot: plot,
             respawn: respawn,
             shield: shield,
             identifier: identifier,
@@ -724,24 +718,15 @@ function flyingswords() {
 
     var init = function () {
         helper.createBoard();
-        //grid.create();
         entities.spawnEntity(player);
-        //player.plot();
         var i = 0;
         var stopindex = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stopindex; i += 1) {
-            //enemySpawner.add();
             entities.spawnEntity(basicEnemy);
         }
         addEventListener("keydown", document, handleKeyboardEvent);
-        //placeObstacles();
-        var stopindex = defaults.levels[currentLevel].numberOfObstacles;
-        for (i = 0; i < stopindex; i += 1) {
-            entities.spawnEntity(obstacle);
-        }
-        
+        placeObstacles();
         entities.spawnEntity(shield);
-        //placeShield();
         pauseController.unpause();
         //soundController.soundengine.music.play();
         updateStats();
@@ -764,10 +749,12 @@ function flyingswords() {
             if (yDir === undefined) {
                 yDir = 0;
             }
-            grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
-            position[0] += xDir;
-            position[1] += yDir;
-            grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            if (xDir != 0 || yDir != 0) {
+                grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
+                position[0] += xDir;
+                position[1] += yDir;
+                grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            }
         };
         
         var reportPosition = function () {
@@ -812,10 +799,12 @@ function flyingswords() {
             if (yDir === undefined) {
                 yDir = 0;
             }
-            grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
-            position[0] += xDir;
-            position[1] += yDir;
-            grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            if (xDir != 0 || yDir != 0) {
+                grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
+                position[0] += xDir;
+                position[1] += yDir;
+                grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            }
         };
         
         var reportCSSclass = function () {
@@ -863,7 +852,7 @@ function flyingswords() {
             if (alive) {
                 var playerpos = entities.all()[1].position();  // TODO - expose player in entities API instead of assuming id 1
                 grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); // helper.clearCell(enemyPosition);
-                helper.removeClassForCell("enemy", enemyPosition);
+                //helper.removeClassForCell("enemy", enemyPosition);
                 var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
                 var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
                 enemyPosition[0] = enemyPosition[0] + directionX;
