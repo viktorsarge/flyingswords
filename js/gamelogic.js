@@ -329,16 +329,21 @@ function flyingswords() {
         };
 
         var plotChanged = function () {
+            console.log("in plotChanged");
             var square = "";
             var j = 0;
             var currentSquareID = "";
             var entityIDs = "";
             var currentEntity = "";
-            var stopindex = squaresToUpdate.length;  
+            var stopindex = squaresToUpdate.length; 
+            console.log("squaresToUpdate.length: " + stopindex + " " + squaresToUpdate);
             for (i = 0; i < stopindex; i += 1) {    // Iterating over each changed square
                 currentSquareID = squaresToUpdate[i];   // Less complex handle for the current square
                 square = document.getElementById(squaresToUpdate[i]);   // Access to current square in DOM. 
                 square.innerHTML = "";                                  // Cleaning the current square before adding to it
+                if (squares[squaresToUpdate[i]].length > 1) {
+                    console.log("BOOOOM - COllision");
+                }
                 for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
                     entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
                     currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
@@ -359,6 +364,7 @@ function flyingswords() {
     var entities = (function () {
         var allEntities = {};
         var alive = [];
+        var thePlayerID = "";
 
         var all = function () {
             return allEntities;
@@ -369,13 +375,17 @@ function flyingswords() {
         };
 
         var spawnEntity = function (type) {
-            var id = uniqueId.create();
-            allEntities[id] = type(id);
-            allEntities[id].plot();
-            console.log("entities.spawnEntity - allEntities[id].enemyPosition(): " + allEntities[id].enemyPosition());
-            var pos = "x" + allEntities[id].enemyPosition()[0] + "y" +  allEntities[id].enemyPosition()[1];
+            var id = uniqueId.create(); // Setting up an id for the new entity
+            if (type == player) {
+                thePlayerID = id;
+            }
+            allEntities[id] = type(id);  // Spawning a new entity and adding it to the entity-object
+            allEntities[id].plot();  // Plotting to make visible. TODO - change to triggering a replot changed instead. 
+            //console.log("entities.spawnEntity - allEntities[id].enemyPosition(): " + allEntities[id].enemyPosition());
+            var pos = "x" + allEntities[id].position()[0] + "y" +  allEntities[id].position()[1];
             grid.addEntity(pos, id);
             alive.push(id);
+            return id;
         };
 
         var despawnAll = function () {
@@ -390,12 +400,17 @@ function flyingswords() {
             alive.splice(index,1);
         };
 
+        var playerID = function () {
+            return thePlayerID;
+        };
+
         return {
             spawnEntity: spawnEntity,
             despawnEntity: despawnEntity,
             despawnAll: despawnAll,
             all: all,
-            living: living
+            living: living,
+            playerID: playerID
         };
     }());
 
@@ -436,9 +451,11 @@ function flyingswords() {
         delayFunction(gameRestart, defaults.defDelay);
     };
 
-    var player = (function () {
+    var player = function (id) {
+        var myGlobalId = id;
+        console.log("Player id: " + myGlobalId);
         var direction = [];
-        var identifier = "O";
+        var identifyingCharacter = "O";
         var position = defaults.playerPos;
         var alive = true;
         var shield = 0;
@@ -499,7 +516,7 @@ function flyingswords() {
             var cell = [];
             var nextCell = "";
             cell = document.getElementById(currentPos);
-            cell.innerText += identifier;
+            cell.innerText += identifyingCharacter;
             cell.classList.add("player");
             if (shieldhandler.isEquiped()) {
                 cell.classList.add("shieldEquiped");
@@ -536,13 +553,23 @@ function flyingswords() {
         };
 
         var movePlayer = function (xDir, yDir) {
+            if (xDir === undefined) {
+                xDir = 0;
+            }
+            if (yDir === undefined) {
+                yDir = 0;
+            }
             direction = [xDir, yDir];
-            helper.clearCell(position);
+            grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            console.log("movePlayer - grid.removeEntity " + "x" + position[0] + "y" + position[1] + " " + "ID:" + myGlobalId)
             helper.removeClassForCell("player", position);
             helper.removeClassForCell("shieldEquiped", position);
             position[0] = position[0] + xDir;
             position[1] = position[1] + yDir;
-            plot();
+            grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
+            console.log("In player move. Position: " + position);
+            grid.plotChanged();
+            //plot();
         };
 
         var respawn = function () {
@@ -553,16 +580,25 @@ function flyingswords() {
         var reportPosition = function () {
             return position;
         };
+        
+        var identifier = function () {
+            return identifyingCharacter;
+        };
+
+        var reportAliveStatus = function () {
+            return alive;
+        };
 
         return {
-            reportPosition: reportPosition,
-            alive: alive,
-            movePlayer: movePlayer,
+            position: reportPosition,
+            reportAliveStatus: reportAliveStatus,
+            move: movePlayer,
             plot: plot,
             respawn: respawn,
-            shield: shield
+            shield: shield,
+            identifier: identifier
         };
-    }());
+    };
 
     var gameRestart = function () {
         score.reset();
@@ -645,23 +681,23 @@ function flyingswords() {
         if (!pauseController.isPaused()) {
             switch (keycode) {
             case Key.LEFT:
-                if (player.reportPosition()[0] > 0) {
-                    player.movePlayer(-1, 0);
+                if (entities.all()[entities.playerID()].position()[0] > 0) {
+                    entities.all()[entities.playerID()].move(-1, 0);
                 }
                 break;
             case Key.UP:
-                if (player.reportPosition()[1] > 0) {
-                    player.movePlayer(0, -1);
+                if (entities.all()[entities.playerID()].position()[1] > 0) {
+                    entities.all()[entities.playerID()].move(0, -1);
                 }
                 break;
             case Key.RIGHT:
-                if (player.reportPosition()[0] < defaults.xLimit) {
-                    player.movePlayer(1, 0);
+                if (entities.all()[entities.playerID()].position()[0] < defaults.xLimit) {
+                    entities.all()[entities.playerID()].move(1, 0);
                 }
                 break;
             case Key.DOWN:
-                if (player.reportPosition()[1] < defaults.yLimit) {
-                    player.movePlayer(0, 1);
+                if (entities.all()[entities.playerID()].position()[1] < defaults.yLimit) {
+                    entities.all()[entities.playerID()].move(0, 1);
                 }
                 break;
             case Key.P:
@@ -682,7 +718,8 @@ function flyingswords() {
     var init = function () {
         helper.createBoard();
         //grid.create();
-        player.plot();
+        entities.spawnEntity(player);
+        //player.plot();
         var i = 0;
         var stopindex = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stopindex; i += 1) {
@@ -703,7 +740,7 @@ function flyingswords() {
         var identifyingCharacter = "I";
 
         var identifier = function () { 
-            return identifyingCharacter
+            return identifyingCharacter;
         };
         var enemyPosition = putBabyInACorner();
 
@@ -726,8 +763,8 @@ function flyingswords() {
 
         var move = function () {
             if (alive) {
-                var playerpos = player.reportPosition();
-                grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); //helper.clearCell(enemyPosition);
+                var playerpos = entities.all()[1].position();  // TODO - expose player in entities API instead of assuming id 1
+                grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); // helper.clearCell(enemyPosition);
                 helper.removeClassForCell("enemy", enemyPosition);
                 var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
                 var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
@@ -800,7 +837,7 @@ function flyingswords() {
             reportAliveStatus: reportAliveStatus,
             kill: kill,
             alive: alive,
-            enemyPosition: reportPosition,
+            position: reportPosition,
             calculateDirection: calculateDirection,
             collisioncheck: collisioncheck,
             move: move,
