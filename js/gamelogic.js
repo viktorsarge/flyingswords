@@ -396,11 +396,11 @@ function flyingswords() {
                 thePlayerID = id;
             }
             allEntities[id] = type(id);  // Spawning a new entity and adding it to the entity-object
-            grid.plotChanged();           // Triggering plot of the new entity
             //console.log("entities.spawnEntity - allEntities[id].enemyPosition(): " + allEntities[id].enemyPosition());
             var pos = "x" + allEntities[id].position()[0] + "y" +  allEntities[id].position()[1];
             grid.addEntity(pos, id);
             alive.push(id);
+            grid.plotChanged();           // Triggering plot of the new entity
             return id;
         };
 
