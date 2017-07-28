@@ -117,7 +117,7 @@ function flyingswords() {
         };
     }());
 
-    var checkCollision = function (coordinates) {
+/*    var checkCollision = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
         var cell = document.getElementById(currentPos);
         if (cell.innerText.length > 1) {
@@ -125,7 +125,7 @@ function flyingswords() {
         } else {
             return 0;
         }
-    };
+    };*/
 
     var generateCoordinates = function genCoordinates(spec) {
         var xLimit = defaults.xLimit;
@@ -412,7 +412,7 @@ function flyingswords() {
 
         var despawnEntity = function (id) {
             delete allEntities[id];
-            var index = arr.indexOf(id);
+            var index = alive.indexOf(id);
             alive.splice(index,1);
         };
 
@@ -757,6 +757,7 @@ function flyingswords() {
         var myGlobalId = id;
         var alive = true; 
         var identifyingCharacter = "X";
+        var cssClass = "obstacle";
         var position = generateCoordinates({skipCollisionCheck: false}); //TODO - generateCoordinates? 
 
         var identifier = function () {
@@ -786,10 +787,14 @@ function flyingswords() {
             return alive;
         };
         var reportCSSclass = function () {
-            return "obstacle";
+            return cssClass;
         };
 
         var collidedWith = function (entities) {
+            cssClass = "dead";
+            grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId)
+            grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId)
+            grid.plotChanged();
         };
 
         return {
@@ -893,7 +898,9 @@ function flyingswords() {
 
         var kill = function () {
             alive = false;
-            enemySpawner.add();
+            //enemySpawner.add();
+            grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId);
+            entities.despawnEntity(myGlobalId);
             kills += 1;
             score.add();
             updateStats();
@@ -953,6 +960,7 @@ function flyingswords() {
             return "enemy";
         };
         var collidedWith = function (entities) {
+            kill();
         };
 
         return {
