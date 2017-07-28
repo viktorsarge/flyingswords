@@ -31,7 +31,7 @@ function flyingswords() {
         };
     }());
 
-    var isObstacle = function (coordinates) {
+ /*   var isObstacle = function (coordinates) {
         var currentPos = "x" + coordinates[0] + "y" + coordinates[1];
         var cell = document.getElementById(currentPos);
         if (cell.innerHTML.indexOf("X") > -1) {
@@ -60,7 +60,7 @@ function flyingswords() {
             return 0;
         }
     };
-
+*/
     var updateStats = function () {
         var remain = defaults.levels[currentLevel].killsRequired - kills;
         var cell = document.getElementById("leftToKill");
@@ -879,7 +879,7 @@ function flyingswords() {
 
         var move = function () {
             if (alive) {
-                var playerpos = entities.all()[1].position();  // TODO - expose player in entities API instead of assuming id 1
+                var playerpos = entities.all()[entities.playerID()].position();
                 grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); // helper.clearCell(enemyPosition);
                 //helper.removeClassForCell("enemy", enemyPosition);
                 var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
