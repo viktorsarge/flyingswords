@@ -647,8 +647,9 @@ function flyingswords() {
 
     var startLevel = function () {
         helper.clearAllCells();
-        player.respawn();
-        player.plot();
+        //player.respawn();
+        //player.plot();
+        entities.spawnEntity(player);
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
         for (i = 0; i < stop; i += 1) {
@@ -668,6 +669,7 @@ function flyingswords() {
         //enemySpawner.resetSpawnlimit();  // TODO - Replace this! 
 //        enemies = [];
         entities.despawnAll();
+        grid.reset();
         helper.displayText(defaults.texts.levelup + levelnumber);
         delayFunction(startLevel, defaults.defDelay);
     };
@@ -910,6 +912,7 @@ function flyingswords() {
                 pauseController.pause();
                 delayFunction(levelUp, defaults.defDelay);
             }
+            entities.spawnEntity(basicEnemy);
         };
 
 /*        var collisioncheck = function () {
@@ -961,6 +964,7 @@ function flyingswords() {
         };
         var collidedWith = function (entities) {
             kill();
+            // TODO - If colliding with another enemy - spawn a obstacle if there is none already. 
         };
 
         return {
