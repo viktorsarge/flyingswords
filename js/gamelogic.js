@@ -189,6 +189,7 @@ function flyingswords() {
             return paused;
         };
         var unpause = function () {
+            
             clock = setInterval(updateStage, defaults.levels[currentLevel].clockSpeed);
             var cell = document.getElementById("instructions");
             cell.innerText = defaults.texts.instructions;
@@ -279,7 +280,6 @@ function flyingswords() {
         };
     };
 
-    // // // ONGOING DEVELOPMENT
     var uniqueId = (function () {
         var id = 0;
         var create = function () {
@@ -430,33 +430,6 @@ function flyingswords() {
         };
     }());
 
-    // END OF ONGING DEVELOPMENT
-
-/*    var enemySpawner = (function () {
-        var spawnlimit = defaults.levels[currentLevel].killsRequired;
-
-        var resetSpawnlimit = function () {
-            spawnlimit = defaults.levels[currentLevel].killsRequired;
-        };
-        var add = function () {
-            var enemy = "";
-            if (spawnlimit > 0) {
-                enemy = basicEnemy();
-                //enemy = boss();
-                enemy.plot();
-                enemies.push(enemy);
-                spawnlimit -= 1;
-                return true;
-            } else {
-                return false;
-            }
-        };
-        return {
-            add: add,
-            resetSpawnlimit: resetSpawnlimit
-        };
-    }());
-*/
     var gameOver = function () {
         pauseController.pause();
         helper.clearAllCells();
@@ -631,7 +604,6 @@ function flyingswords() {
         currentLevel = 0;
         kills = 0;
         helper.clearAllCells();
-        pauseController.unpause();
         entities.spawnEntity(player);
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
@@ -647,8 +619,6 @@ function flyingswords() {
 
     var startLevel = function () {
         helper.clearAllCells();
-        //player.respawn();
-        //player.plot();
         entities.spawnEntity(player);
         var i = 0;
         var stop = defaults.levels[currentLevel].simultEnemies;
@@ -667,7 +637,6 @@ function flyingswords() {
         currentLevel += 1;
         levelnumber = currentLevel + 1;
         //enemySpawner.resetSpawnlimit();  // TODO - Replace this! 
-//        enemies = [];
         entities.despawnAll();
         grid.reset();
         helper.displayText(defaults.texts.levelup + levelnumber);
@@ -888,7 +857,6 @@ function flyingswords() {
             if (alive) {
                 var playerpos = entities.all()[entities.playerID()].position();
                 grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId); // helper.clearCell(enemyPosition);
-                //helper.removeClassForCell("enemy", enemyPosition);
                 var directionX = calculateDirection(playerpos[0], enemyPosition[0]);
                 var directionY = calculateDirection(playerpos[1], enemyPosition[1]);
                 enemyPosition[0] = enemyPosition[0] + directionX;
@@ -945,16 +913,6 @@ function flyingswords() {
             }
         };
 */
-/*        var plot = function () {
-            var cell = "";
-            if (reportAliveStatus()) {
-                var currentPos = "x" + enemyPosition[0] + " y" + enemyPosition[1];
-                cell = document.getElementsByClassName(currentPos);
-                cell[0].innerHTML += "I";
-                cell[0].classList.add("enemy");
-            }
-        };*/
-
         var reportPosition = function () {
             return enemyPosition;
         };
@@ -962,20 +920,18 @@ function flyingswords() {
         var reportCSSclass = function () {
             return "enemy";
         };
+
         var collidedWith = function (entities) {
             kill();
             // TODO - If colliding with another enemy - spawn a obstacle if there is none already. 
         };
 
         return {
-            reportAliveStatus: reportAliveStatus,
+            alive: reportAliveStatus,
             kill: kill,
-            alive: alive,
             position: reportPosition,
             calculateDirection: calculateDirection,
-//            collisioncheck: collisioncheck,
             move: move,
-//            plot: plot,
             identifier: identifier,
             cssClass: reportCSSclass,
             collidedWith: collidedWith
