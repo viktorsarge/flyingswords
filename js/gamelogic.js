@@ -345,7 +345,7 @@ function flyingswords() {
                     for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
                         entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
                         currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
-                        currentEntity.collidedWith();  
+                        currentEntity.collidedWith();
                         //square.innerHTML += currentEntity.identifier();
                     }
                 }
@@ -367,13 +367,30 @@ function flyingswords() {
                 }
             }
         };
+        
+        var addEventListener = function (func, pos) {
+            var cell = document.getElementById(pos);
+            // Code for Chrome, Safari and Opera
+            cell.addEventListener("webkitAnimationEnd", func);
+            // Standard syntax
+            cell.addEventListener("animationend", func);
+            return;
+        };
+        
+        var addCssClass = function (className, pos) {
+            var cell = document.getElementById(pos);
+            cell.classList.add(className);
+            return;
+        };
 
         return {
             addEntity: addEntity,
             removeEntity: removeEntity,
             squares: squares,
             plotChanged: plotChanged,
-            reset: reset
+            reset: reset,
+            addEventListener: addEventListener,
+            addCssClass: addCssClass
         };
     }());
 
@@ -433,11 +450,9 @@ function flyingswords() {
     var gameOver = function () {
         pauseController.pause();
         helper.clearAllCells();
-        //enemies = [];
         entities.despawnAll();
         grid.reset();
         currentLevel = 0;
-        //enemySpawner.resetSpawnlimit();
         helper.displayText(defaults.texts.gameover);
         delayFunction(gameRestart, defaults.defDelay);
     };
@@ -583,7 +598,13 @@ function flyingswords() {
         };
         
         var collidedWith = function (entities) {
-             gameOver();
+            pauseController.pause();
+            grid.addCssClass("dead", "x" + position[0] + "y" + position[1])
+            grid.addEventListener(gameOver, "x" + position[0] + "y" + position[1]);
+        };
+        
+        var reportType = function () {
+            return "player";
         };
 
         return {
@@ -595,6 +616,7 @@ function flyingswords() {
             shield: shield,
             identifier: identifier,
             cssClass: reportCSSclass,
+            type: reportType
             collidedWith: collidedWith
         };
     };
@@ -767,6 +789,10 @@ function flyingswords() {
             grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId)
             grid.plotChanged();
         };
+        
+        var reportType = function () {
+            return "obstacle";
+        };
 
         return {
             move: move,
@@ -774,7 +800,8 @@ function flyingswords() {
             position: reportPosition,
             alive: reportAliveStatus,
             cssClass: reportCSSclass,
-            collidedWith: collidedWith
+            collidedWith: collidedWith,
+            type: reportType
         }
     };
 
@@ -815,15 +842,19 @@ function flyingswords() {
         var collidedWith = function (entities) {
         };
 
+        var reportType = function () {
+            return "shield";
+        };
+
         return {
             alive: reportAliveStatus,
             identifier: identifier,
             position: reportPosition,
             move: move,
             cssClass: reportCSSclass,
-            collidedWith: collidedWith
+            collidedWith: collidedWith,
+            type: reportType
         };
-        
     }
 
     var basicEnemy = function (id) {
@@ -925,6 +956,10 @@ function flyingswords() {
             kill();
             // TODO - If colliding with another enemy - spawn a obstacle if there is none already. 
         };
+        
+        var reportType = function () {
+            return "enemy";
+        };
 
         return {
             alive: reportAliveStatus,
@@ -934,8 +969,8 @@ function flyingswords() {
             move: move,
             identifier: identifier,
             cssClass: reportCSSclass,
-            collidedWith: collidedWith
-            
+            collidedWith: collidedWith,
+            type: reportType
         };
     };
 
