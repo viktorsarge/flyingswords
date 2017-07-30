@@ -345,15 +345,20 @@ function flyingswords() {
                     for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
                         entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
                         currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
-                        currentEntity.collidedWith();
-                        //square.innerHTML += currentEntity.identifier();
+                        currentEntity.collidedWith(squares[squaresToUpdate[i]]);  // Telling the entity what other entities it has collided with
                     }
                 }
                 for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
                     entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
                     currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
-                    square.innerHTML += currentEntity.identifier();  // Adding the character of current entity to the square
-                    square.classList.add(currentEntity.cssClass());
+                    if (currentEntity.alive()) {
+                        square.innerHTML += currentEntity.identifier();  // Adding the character of current entity to the square
+                        square.classList.add(currentEntity.cssClass());  // 
+                    } else {
+                        removeCSSclass(currentEntity.cssClass(), currentSquareID);
+                        removeEntity(currentSquareID, currentEntity);
+                        entities.despawnEntity(currentEntity);
+                    }
                 }
             }
             squaresToUpdate = [];  // Cleaning of array of positions with updates before next iteration
@@ -382,6 +387,11 @@ function flyingswords() {
             cell.classList.add(className);
             return;
         };
+        
+        var removeCSSclass = function (className, pos) {
+            var cell = document.getElementById(pos);
+            cell.classList.remove(className);
+        };
 
         return {
             addEntity: addEntity,
@@ -390,7 +400,8 @@ function flyingswords() {
             plotChanged: plotChanged,
             reset: reset,
             addEventListener: addEventListener,
-            addCssClass: addCssClass
+            addCssClass: addCssClass,
+            removeCSSclass: removeCSSclass
         };
     }());
 
@@ -465,6 +476,7 @@ function flyingswords() {
         var position = defaults.playerPos;
         var alive = true;
         var shield = 0;
+        var myCSSclass = "player";
         var shieldhandler = (function () {
             var equiped = false;
             var increase = function (amount) {
@@ -476,11 +488,12 @@ function flyingswords() {
 
             var broken = function () {
                 equiped = false;
-                identifier = "O";
+                identifyingCharacter = "O";
                 placeShield();
-                helper.removeClassForCell("shieldEquiped", position);
-                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                cell.innerHTML = cell.innerHTML.replace("0", identifier);
+                myCSSclass = "player";
+                //helper.removeClassForCell("shieldEquiped", position);
+                //var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                //cell.innerHTML = cell.innerHTML.replace("0", identifier);
             };
 
             var decrease = function (amount) {
@@ -500,10 +513,11 @@ function flyingswords() {
             var equip = function () {
                 equiped = true;
                 shield += 3;
-                var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                helper.addClassForCell("shieldEquiped", position);
-                cell.innerHTML = cell.innerHTML.replace(identifier, "");
-                identifier = "0";
+                myCSSclass = "shieldEquiped";
+                //var cell = document.getElementById("x" + position[0] + "y" + position[1]);
+                //helper.addClassForCell("shieldEquiped", position);
+                //cell.innerHTML = cell.innerHTML.replace(identifier, "");
+                identifyingCharacter = "0";
             };
 
             return {
@@ -568,8 +582,6 @@ function flyingswords() {
             direction = [xDir, yDir];
             grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
             //console.log("movePlayer - grid.removeEntity " + "x" + position[0] + "y" + position[1] + " " + "ID:" + myGlobalId)
-            //helper.removeClassForCell("player", position);
-            //helper.removeClassForCell("shieldEquiped", position);
             position[0] = position[0] + xDir;
             position[1] = position[1] + yDir;
             grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId);
@@ -593,14 +605,40 @@ function flyingswords() {
         var reportAliveStatus = function () {
             return alive;
         };
+
         var reportCSSclass = function () {
-            return "player";
+            return myCSSclass;
         };
         
-        var collidedWith = function (entities) {
-            pauseController.pause();
-            grid.addCssClass("dead", "x" + position[0] + "y" + position[1])
-            grid.addEventListener(gameOver, "x" + position[0] + "y" + position[1]);
+        var collidedWith = function (input) {
+            var i = 0;
+            var stop = input.length;
+            var type = "";
+            console.log("player.collidedWith - input: " + input);
+            for (i = 0; i < stop; i += 1) {
+                if (input[i] != myGlobalId) {
+                    console.log("player.collidedWith KOLLA DEN HÄR: " + input[i]);
+                    type = entities.all()[input[i]].type();
+                    console.log("collidedWith: " + type);
+                    switch(type) {
+                        case "shield":
+                            shieldhandler.equip();  
+                            //grid.removeEntity("x" + position[0] + "y" + position[1], input[i]);
+                            entities.all()[input[i]].kill();  // Setting alive flag of shield entity to false 
+                            break;
+                        case "enemy":
+                            pauseController.pause();
+                            grid.addCssClass("dead", "x" + position[0] + "y" + position[1])
+                            grid.addEventListener(gameOver, "x" + position[0] + "y" + position[1]);
+                            break;
+                        case "obstacle":
+                            pauseController.pause();
+                            grid.addCssClass("dead", "x" + position[0] + "y" + position[1])
+                            grid.addEventListener(gameOver, "x" + position[0] + "y" + position[1]);
+                            break;
+                    }
+                }
+            }
         };
         
         var reportType = function () {
@@ -610,13 +648,14 @@ function flyingswords() {
         return {
             position: reportPosition,
             reportAliveStatus: reportAliveStatus,
+            alive: reportAliveStatus,
             move: movePlayer,
 //          plot: plot,
             respawn: respawn,
             shield: shield,
             identifier: identifier,
             cssClass: reportCSSclass,
-            type: reportType
+            type: reportType,
             collidedWith: collidedWith
         };
     };
@@ -654,8 +693,9 @@ function flyingswords() {
 
     var levelUp = function () {
         var levelnumber = 0;
+        pauseController.pause();
         kills = 0;
-        helper.clearAllCells();
+        //helper.clearAllCells();
         currentLevel += 1;
         levelnumber = currentLevel + 1;
         //enemySpawner.resetSpawnlimit();  // TODO - Replace this! 
@@ -789,7 +829,7 @@ function flyingswords() {
             grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId)
             grid.plotChanged();
         };
-        
+
         var reportType = function () {
             return "obstacle";
         };
@@ -824,9 +864,11 @@ function flyingswords() {
             if (xDir === undefined) {
                 xDir = 0;
             }
+
             if (yDir === undefined) {
                 yDir = 0;
             }
+
             if (xDir != 0 || yDir != 0) {
                 grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId);
                 position[0] += xDir;
@@ -845,6 +887,10 @@ function flyingswords() {
         var reportType = function () {
             return "shield";
         };
+        
+        var kill = function () {
+            alive = false;
+        };
 
         return {
             alive: reportAliveStatus,
@@ -853,7 +899,8 @@ function flyingswords() {
             move: move,
             cssClass: reportCSSclass,
             collidedWith: collidedWith,
-            type: reportType
+            type: reportType,
+            kill: kill
         };
     }
 
