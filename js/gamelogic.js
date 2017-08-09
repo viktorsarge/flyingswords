@@ -247,7 +247,7 @@ function flyingswords() {
             }
         };
 
-        var plot = function () {
+/*        var plot = function () {
             var cell = "";
             if (alive) {
                 // TODO: Tidy up this part
@@ -265,7 +265,7 @@ function flyingswords() {
                 cell.innerHTML += "S";
                 cell.classList.add("enemy");
             }
-        };
+        }; */
 
         var fire = function () {}; // Todo: When to trigger?
 
@@ -338,27 +338,22 @@ function flyingswords() {
                 currentSquareID = squaresToUpdate[i];   // Less complex handle for the current square
                 square = document.getElementById(squaresToUpdate[i]);   // Access to current square in DOM. 
                 square.innerHTML = "";                                  // Cleaning the current square before adding to it
-                //square.classList = "";
-                if (squares[squaresToUpdate[i]].length > 1) {
-                    console.log("BOOOOM - Collision");
-                    // TODO: Call each of the entities with info on what they collided with. 
+                if (squares[squaresToUpdate[i]].length > 1) {  // Collision detected and has to be handled.
+                    // console.log("BOOOOM - Collision"); 
+
+                    // Telling each entity which other entities they have collided with
                     for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
-                        entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
+                        entityIDs = squares[currentSquareID]; // Less complex handle for array with IDs of entities in current square
                         currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
                         currentEntity.collidedWith(squares[squaresToUpdate[i]]);  // Telling the entity what other entities it has collided with
                     }
                 }
+
                 for (j = 0; j < squares[squaresToUpdate[i]].length; j += 1) {      // Iterating over each entity in the square
-                    entityIDs = squares[currentSquareID];     // Less complex handle for array with IDs of entities in current square
-                    currentEntity = entities.all()[entityIDs[j]];  // Giving current entity a handle
-                    if (currentEntity.alive()) {
-                        square.innerHTML += currentEntity.identifier();  // Adding the character of current entity to the square
-                        square.classList.add(currentEntity.cssClass());  // 
-                    } else {
-                        removeCSSclass(currentEntity.cssClass(), currentSquareID);
-                        removeEntity(currentSquareID, currentEntity);
-                        entities.despawnEntity(currentEntity);
-                    }
+                    entityIDs = squares[squaresToUpdate[i]];  // Less complex handle for array with IDs of entities in current square
+                    currentEntity = entityIDs[j];  // Giving current entity a handle
+                    square.innerHTML += entities.all()[currentEntity].identifier();  // Adding the character of current entity to the square
+                    square.classList.add(entities.all()[currentEntity].cssClass());  // 
                 }
             }
             squaresToUpdate = [];  // Cleaning of array of positions with updates before next iteration
@@ -415,6 +410,22 @@ function flyingswords() {
         };
 
         var living = function () {
+            console.log("alive-array before checking for dead: " + alive);
+            var i = 0; 
+            var remove = [];
+            var pos = "";
+            for (i = 0; i < alive.length; i += 1) {  // Parsing all registered entities 
+                if (allEntities[alive[i]].alive() === false) {  // Check in the object with actual entities if they are alive
+                    remove.push(alive[i]);   // Set up the id of dead entities for removal
+                }
+            }
+            console.log("These are set up for despawn - remove: " + remove);
+            for (i = 0; i < remove.length; i += 1) {
+                pos = "x" + allEntities[remove[i]].position()[0] + "y" + allEntities[remove[i]].position()[1];
+                grid.removeEntity(pos, remove[i]);
+                despawnEntity(remove[i]);
+            }
+            console.log("Nu ser alive-array ut såhär: " + alive);
             return alive;
         };
 
@@ -489,11 +500,8 @@ function flyingswords() {
             var broken = function () {
                 equiped = false;
                 identifyingCharacter = "O";
-                placeShield();
+                entities.spawnEntity(shield);
                 myCSSclass = "player";
-                //helper.removeClassForCell("shieldEquiped", position);
-                //var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                //cell.innerHTML = cell.innerHTML.replace("0", identifier);
             };
 
             var decrease = function (amount) {
@@ -514,9 +522,6 @@ function flyingswords() {
                 equiped = true;
                 shield += 3;
                 myCSSclass = "shieldEquiped";
-                //var cell = document.getElementById("x" + position[0] + "y" + position[1]);
-                //helper.addClassForCell("shieldEquiped", position);
-                //cell.innerHTML = cell.innerHTML.replace(identifier, "");
                 identifyingCharacter = "0";
             };
 
@@ -623,8 +628,7 @@ function flyingswords() {
                     switch(type) {
                         case "shield":
                             shieldhandler.equip();  
-                            //grid.removeEntity("x" + position[0] + "y" + position[1], input[i]);
-                            entities.all()[input[i]].kill();  // Setting alive flag of shield entity to false 
+                            entities.all()[input[i]].kill(); // Setting alive flag of shield entity to false 
                             break;
                         case "enemy":
                             pauseController.pause();
@@ -827,7 +831,7 @@ function flyingswords() {
             cssClass = "dead";
             grid.removeEntity("x" + position[0] + "y" + position[1], myGlobalId)
             grid.addEntity("x" + position[0] + "y" + position[1], myGlobalId)
-            grid.plotChanged();
+            //grid.plotChanged();
         };
 
         var reportType = function () {
@@ -947,8 +951,8 @@ function flyingswords() {
         var kill = function () {
             alive = false;
             //enemySpawner.add();
-            grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId);
-            entities.despawnEntity(myGlobalId);
+            //grid.removeEntity("x" + enemyPosition[0] + "y" + enemyPosition[1], myGlobalId);
+            //entities.despawnEntity(myGlobalId);
             kills += 1;
             score.add();
             updateStats();
@@ -999,10 +1003,34 @@ function flyingswords() {
             return "enemy";
         };
 
-        var collidedWith = function (entities) {
-            kill();
-            // TODO - If colliding with another enemy - spawn a obstacle if there is none already. 
+        var collidedWith = function (input) {
+            var i = 0;
+            var stop = input.length;
+            var type = "";
+            console.log("baiscEnemy.collidedWith - input: " + input);
+            for (i = 0; i < stop; i += 1) {
+                if (input[i] != myGlobalId) {
+                    console.log("basicEnemy.collidedWith KOLLA DEN HÄR: " + input[i]);
+                    type = entities.all()[input[i]].type();
+                    console.log("collidedWith: " + type);
+                    switch(type) {
+                        case "enemy":
+                            kill();
+                            //entities.spawnEntitiy(obstacle);
+                            // Spawna en obstacle strax
+                            break;
+                        case "obstacle":
+                            kill();
+                            break;
+                        case "player":
+                            kill();
+                            break;
+
+                    }
+                }
+            }
         };
+
         
         var reportType = function () {
             return "enemy";
