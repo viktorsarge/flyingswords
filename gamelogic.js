@@ -359,8 +359,8 @@ function flyingswords(helper, defaults) {
 
     var updateStats = function () {
         var remain = defaults.levels[currentLevel].killsRequired - kills;
-        var cell = document.getElementById("leftToKill");
-        cell.innerHTML = remain;
+        //var cell = document.getElementById("leftToKill");
+        //cell.innerHTML = remain;
     };
 
     // Cleartext translation of keycodes for readability

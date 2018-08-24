@@ -1,25 +1,20 @@
 <html>
-<head>
-<link rel="stylesheet" type="text/css" href="css/flyingswords.css">
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/flyingswords.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body onLoad="">
+		<div id="stats"> 
+			Score: <span id="score"></span>
+		</div>
 
-</head>
-<body onLoad="">
-<div id="stats">
-<p>Enemies left: <span id="leftToKill"></span></p>
-<p>Score: <span id="score"></span></p>
-<span id=""></span>
-</div>
-
-<div id="gamecontainer">
-</div>
-<div>
-<p id="instructions">( Use arrow keys to play )</p>
-</div>
-<p id="musicToggle" onclick="soundController.soundengine.togglePlayback()">Music on/off</p>
-<script src="soundengine.js"></script>
-<script src="defaults.js"></script>
-<script src="helper-functions.js"></script>
-<script src="gamelogic.js"></script>
-
-</body>
+		<div id="gamecontainer">
+		</div>
+		
+		<p id="musicToggle" onclick="soundController.soundengine.togglePlayback()">Music on/off</p>
+		<script src="soundengine.js"></script>
+		<script src="defaults.js"></script>
+		<script src="helper-functions.js"></script>
+		<script src="gamelogic.js"></script>
+	</body>
 </html>
