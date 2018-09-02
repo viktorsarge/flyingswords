@@ -5,16 +5,26 @@
 	</head>
 	<body onLoad="">
 		<div id="stats"> 
-			Score: <span id="score"></span>
+			Score: <span id="score">0</span>
 		</div>
 
 		<div id="gamecontainer">
 		</div>
-		
-		<p id="musicToggle" onclick="soundController.soundengine.togglePlayback()">Music on/off</p>
+
+		<!--<p id="musicToggle" onclick="soundController.soundengine.togglePlayback()">Music on/off</p>-->
+		<script src="js/keyboard.js"></script>
+		<script src="js/helpers.js"></script>
+		<script src="js/defaults.js"></script>
+		<script src="js/obstacle.js"></script>
+		<script src="js/worldmap.js"></script>		
+		<script src="js/gamelogic.js"></script>
+		<script src="js/player.js"></script>
+
+		<!--
 		<script src="soundengine.js"></script>
 		<script src="defaults.js"></script>
 		<script src="helper-functions.js"></script>
 		<script src="gamelogic.js"></script>
+		-->
 	</body>
 </html>
