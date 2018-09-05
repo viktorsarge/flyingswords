@@ -47,22 +47,27 @@ td {
     background-color: #44B3C2;
     color: #F2EDD8;
     height: 100%;
+    padding-top: 0.2em;
 }
 
 .obstacle {
     background-color: #5D4C46;
     color: #F1A94E;
     animation-name: rotatingForever;
-    animation-duration: 8s;
+    animation-duration: 5s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
     height: 100%;
+    padding-top: 0.2em;
+    border-radius: 1em;
 }
 
 .enemy
 {
     background-color: #F1A94E;
     color: #E45641;
+    height: 100%;
+    padding-top: 0.2em;
 }
 
 .noanimation {

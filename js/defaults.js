@@ -9,7 +9,9 @@ var defaults = (function () {
     var yLimit = 8;
     var xLimitMap = 14;
     var yLimitMap = 8;
-    var playerPos = [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
+    var playerPos = function () {
+        return [Math.floor(xLimit / 2), Math.floor(yLimit / 2)];
+    };
     var objectSymbols = {
         player: "O",
         obstacle: "X",
