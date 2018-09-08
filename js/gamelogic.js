@@ -2,10 +2,10 @@
 
 var helper = helpers();
 
-var gameobjects = function() {
+// TODO - collisionrules should be it's own controller since it's specific for each game.
+//        possibly it could be in defaults. 
 
-};
-
+// Game is self invoking, but does a restart at the bottom as a form of init.
 var game = (function() {
     var pauseState = true;
     var level = 0;
@@ -20,21 +20,17 @@ var game = (function() {
     };
 
     var setupLevel = function () {
-
+        // TODO: Might be better to have restart take a "level" parameter
     };
 
     var switchPauseState = function () {
         if (pauseState) {
             pauseState = false;
-            clock = setInterval(killer.move, defaults.levels[level].clockSpeed);
+            clock = setInterval(enemies.update, defaults.levels[level].clockSpeed);
         } else {
             pauseState = true;
             clearInterval(clock);
         }
-    };
-
-    var init = function() {
-        return true;
     };
 
     var start = function() {
@@ -49,10 +45,6 @@ var game = (function() {
 
     var isPaused = function() {
         return pauseState;
-    };
-
-    var update = function() {
-
     };
 
     var score = (function () {
@@ -75,7 +67,6 @@ var game = (function() {
     }());
 
     return {
-        init: init,
         start: start,
         pause: pause,
         isPaused: isPaused,

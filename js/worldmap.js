@@ -20,10 +20,6 @@ var worldmap = (function () {
         }
     };
 
-    makeEmptyWorld();  
-
-    console.log(worldarray);
-
     // Adds the id of a game object at world array x, y pos.
     var addIdAt = function (id, x, y) {
         worldarray[y][x].push(id);

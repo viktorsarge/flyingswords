@@ -5,7 +5,11 @@ var idGenerator = (function() {
     var entities = {};
     var generate = function(type) {
         i += 1;
-        // Add "i: type" to entities
+        entities[i] = type;
+        /*
+        console.log("ID and type object");
+        console.log(entities);
+        */
         return i;
     };
 
@@ -13,8 +17,8 @@ var idGenerator = (function() {
     // TODO:   and save a object with id´s and types-
     // TODO:   also - report the type of an id
 
-    var getTypeOfId = function () {
-
+    var getTypeOfId = function (id) {
+        return entities[id];
     };
 
     return {

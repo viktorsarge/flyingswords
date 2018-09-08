@@ -10,8 +10,9 @@ var player = (function () {
     var y1 = position[1];
     var x2 = x1;
     var y2 = y1;
-    var id = idGenerator.generate();
     var type = "player";
+    var id = idGenerator.generate(type);
+
     //worldmap.addIdAt(id, x1, y1);
     //helper.plotObjectByPosAndType(x1, y1, type, id);
 
