@@ -15,6 +15,7 @@ var game = (function() {
         worldmap.makeEmptyWorld();
         helper.createBoard();
         player.reset();
+        enemies.clear();
         level = 0;
         placeObstacles(defaults.levels[level]["numberOfObstacles"]);
     };
@@ -48,7 +49,6 @@ var game = (function() {
     };
 
     var score = (function () {
-    // Scorekeeping. Can add one or reset score.
         var points = 0;
         var cell = document.getElementById("score");
         cell.innerHTML = points;

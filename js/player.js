@@ -4,7 +4,6 @@
 // The player moves on input and is independant from game clock
 var player = (function () {
     // Run on init
-    // var life = 1;
     var position = defaults.playerPos();
     var x1 = position[0];
     var y1 = position[1];
@@ -13,9 +12,6 @@ var player = (function () {
     var type = "player";
     var id = idGenerator.generate(type);
 
-    //worldmap.addIdAt(id, x1, y1);
-    //helper.plotObjectByPosAndType(x1, y1, type, id);
-
     var move = function (direction) {
         if (!game.isPaused()) {
             switch (direction) {
@@ -23,6 +19,7 @@ var player = (function () {
                 y2 = y1 - 1;
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
+                        helper.removeHTMLbyId(id);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         y1 = y2;
                     } else {
@@ -39,6 +36,7 @@ var player = (function () {
                 y2 = y1 + 1;
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
+                        helper.removeHTMLbyId(id);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         y1 = y2;
                     } else {
@@ -54,6 +52,7 @@ var player = (function () {
                 x2 = x1 + 1;
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
+                        helper.removeHTMLbyId(id);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         x1 = x2;
                     } else {
@@ -69,6 +68,7 @@ var player = (function () {
                 x2 = x1 - 1;
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
+                        helper.removeHTMLbyId(id);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         x1 = x2;
                     } else {

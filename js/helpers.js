@@ -6,16 +6,8 @@ var idGenerator = (function() {
     var generate = function(type) {
         i += 1;
         entities[i] = type;
-        /*
-        console.log("ID and type object");
-        console.log(entities);
-        */
         return i;
     };
-
-    // TODO: Add functionality to take type as input
-    // TODO:   and save a object with id´s and types-
-    // TODO:   also - report the type of an id
 
     var getTypeOfId = function (id) {
         return entities[id];

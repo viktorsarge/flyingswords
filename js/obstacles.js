@@ -8,11 +8,8 @@ var placeObstacles = function (nr = 1) {
     var type = "obstacle";
 
     var inCorner = function (x, y) {
-        console.log("in notInCorner function");
-        console.log(x, defaults.xLimit, y, defaults.yLimit);
         if ((x === defaults.xLimit || x === 0) && (y === 0 || y === defaults.yLimit)) {
             return true;
-            console.log("Obstacle in corner - should generate new pos");
         } else {    
             return false;
         }
@@ -35,3 +32,5 @@ var placeObstacles = function (nr = 1) {
         i += 1;
     }
 };
+
+// TODO: Perhaps have obstacles animate only when player is near? 

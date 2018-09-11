@@ -45,7 +45,7 @@ var worldmap = (function () {
 
                 if (index > -1) {
                     worldarray[y1][x1].splice(index);
-                    helper.removeHTMLbyId(id);
+                    //helper.removeHTMLbyId(id);
                 }
                 // Add to the left at the new position
                 worldarray[y2][x2].unshift(id);
@@ -54,7 +54,7 @@ var worldmap = (function () {
 
                 if (index > -1) {
                     worldarray[y1][x1].splice(index);
-                    helper.removeHTMLbyId(id);
+                    //helper.removeHTMLbyId(id);
                 }
                 // Add to the right at the new position
                 worldarray[y2][x2].push(id);
@@ -69,10 +69,15 @@ var worldmap = (function () {
         if (x < 0 || x > defaults.xLimit || y < 0 || y > defaults.yLimit) {
             return true;
         } else if (worldarray[y][x].length > 0) {
+            console.log(worldarray[y][x]);
             return false;
         } else {
             return true;
         }
+    };
+
+    var idsAt = function (x, y) {
+        return worldarray[y][x];
     };
 
     return {
@@ -80,7 +85,8 @@ var worldmap = (function () {
         removeIdAt: removeIdAt,
         moveIdFromTo: moveIdFromTo,
         isEmptyPos: isEmptyPos,
-        makeEmptyWorld: makeEmptyWorld
+        makeEmptyWorld: makeEmptyWorld,
+        idsAt: idsAt
     };
 
 }());
