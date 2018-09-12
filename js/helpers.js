@@ -88,12 +88,31 @@ var helpers = function () {
         };
     }());
 
+    var typeAtXY = function (type, x, y) {
+        console.log("Type at X Y being called" + type + x + y);
+        var arr = worldmap.idsAt(x, y);
+        var i;
+        var found = false;
+        for (i = 0; i < arr.length; i += 1) {
+            if (idGenerator.getTypeOfId(arr[i]) === type) {
+                found = true;
+            }
+        }
+
+        if (found) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
 
     return {
         createBoard: createBoard,
         removeHTMLbyId: removeHTMLbyId,
         plotObjectByPosAndType: plotObjectByPosAndType,
         randomIntFromInterval: randomIntFromInterval,
-        getNextCornerXY: putBabyInACorner
+        getNextCornerXY: putBabyInACorner,
+        typeAtXY: typeAtXY
     };
 };

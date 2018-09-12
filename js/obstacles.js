@@ -1,6 +1,6 @@
 "use strict";
 
-var placeObstacles = function (nr = 1) {
+var placeObstacles = function (nr = 1, placeAtX = false, placeAtY = false) {
     var i = 0;
     var x;
     var y;
@@ -10,7 +10,7 @@ var placeObstacles = function (nr = 1) {
     var inCorner = function (x, y) {
         if ((x === defaults.xLimit || x === 0) && (y === 0 || y === defaults.yLimit)) {
             return true;
-        } else {    
+        } else {
             return false;
         }
     };
@@ -25,7 +25,14 @@ var placeObstacles = function (nr = 1) {
         }
     };
     while (i < nr) {
-        generatePos();
+        if (placeAtX === false && placeAtY === false) {
+            generatePos();
+            console.log("Created random pos")
+        } else {
+            x = placeAtX;
+            y = placeAtY;
+            console.log("Using posted coordinates");
+        }
         id = idGenerator.generate(type);
         worldmap.addIdAt(id, x, y);
         helper.plotObjectByPosAndType(x, y, type, id);
@@ -33,4 +40,4 @@ var placeObstacles = function (nr = 1) {
     }
 };
 
-// TODO: Perhaps have obstacles animate only when player is near? 
+// TODO: Perhaps have obstacles animate only when player is near?

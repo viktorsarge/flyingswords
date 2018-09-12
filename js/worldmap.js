@@ -30,6 +30,23 @@ var worldmap = (function () {
         worldarray[y][x].splice(index, 1);
     };
 
+    var moreThanIdAtXY = function (id, x, y) {
+        var alone;
+        var arr = worldarray[y][x];
+        if (arr.length > 1) {
+            alone = false;
+        } else {
+            alone = true;
+        }
+
+        if (alone) { 
+            return false;
+        } else {
+            return true;
+        } 
+
+    };
+
     // Moves the id of a game object in the world array
     var moveIdFromTo = function (id, x1, y1, x2, y2) {
         var index;
@@ -80,13 +97,24 @@ var worldmap = (function () {
         return worldarray[y][x];
     };
 
+    var killEveryoneAt = function (x, y) { 
+        var i;
+        var arr = worldarray[y][x];
+        for (i = 0; i < arr.length; i += 1) {
+            // arr[i].die();   -- TODO: This wont work - is just an id. 
+        }
+    };
+
+
     return {
         addIdAt: addIdAt,
         removeIdAt: removeIdAt,
         moveIdFromTo: moveIdFromTo,
         isEmptyPos: isEmptyPos,
         makeEmptyWorld: makeEmptyWorld,
-        idsAt: idsAt
+        idsAt: idsAt,
+        killEveryoneAt: killEveryoneAt,
+        moreThanIdAtXY: moreThanIdAtXY
     };
 
 }());
