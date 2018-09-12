@@ -17,6 +17,7 @@ var game = (function() {
         player.reset();
         enemies.clear();
         level = 0;
+        score.reset();
         placeObstacles(defaults.levels[level]["numberOfObstacles"]);
     };
 
