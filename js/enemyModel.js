@@ -24,7 +24,6 @@ var enemy = function () {
     };
 
     var die = function () {
-        //worldmap.removeIdAt(id, x1, y1);
         game.score.add();
         alive = false;
     };
@@ -40,15 +39,18 @@ var enemy = function () {
     };
 
     var collisionCheck = function () {
+        var obstacleId;
+        var obstacleRef;
         // Restart if hit the player
         if (x2 === player.reportPosition()[0] && y2 === player.reportPosition()[1]) {
             game.restart();
         } else if (worldmap.moreThanIdAtXY(id, x2, y2)) {
-            die();
-            //worldmap.killEveryoneAt(x2, y2);
             if (!helper.typeAtXY("obstacle", x2, y2)) {
-                placeObstacles(1, x2, y2);
+                obstacleId = placeObstacles(1, x2, y2);
+                obstacleRef = document.getElementById(obstacleId);
+                obstacleRef.classList.add("dead");
             }
+            die();
         }
     };
 

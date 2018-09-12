@@ -89,7 +89,6 @@ var helpers = function () {
     }());
 
     var typeAtXY = function (type, x, y) {
-        console.log("Type at X Y being called" + type + x + y);
         var arr = worldmap.idsAt(x, y);
         var i;
         var found = false;

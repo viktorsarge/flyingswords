@@ -59,19 +59,15 @@ var worldmap = (function () {
             // Add to left or right of new position
             if (x1 < x2) {
                 // Remove id from old position if found
-
                 if (index > -1) {
                     worldarray[y1][x1].splice(index);
-                    //helper.removeHTMLbyId(id);
                 }
                 // Add to the left at the new position
                 worldarray[y2][x2].unshift(id);
             } else {
                 // Remove from the old position if found
-
                 if (index > -1) {
-                    worldarray[y1][x1].splice(index);
-                    //helper.removeHTMLbyId(id);
+                    worldarray[y1][x1].splice(index);;
                 }
                 // Add to the right at the new position
                 worldarray[y2][x2].push(id);
@@ -86,7 +82,6 @@ var worldmap = (function () {
         if (x < 0 || x > defaults.xLimit || y < 0 || y > defaults.yLimit) {
             return true;
         } else if (worldarray[y][x].length > 0) {
-            console.log(worldarray[y][x]);
             return false;
         } else {
             return true;
@@ -97,14 +92,6 @@ var worldmap = (function () {
         return worldarray[y][x];
     };
 
-    var killEveryoneAt = function (x, y) { 
-        var i;
-        var arr = worldarray[y][x];
-        for (i = 0; i < arr.length; i += 1) {
-            // arr[i].die();   -- TODO: This wont work - is just an id. 
-        }
-    };
-
 
     return {
         addIdAt: addIdAt,
@@ -113,7 +100,6 @@ var worldmap = (function () {
         isEmptyPos: isEmptyPos,
         makeEmptyWorld: makeEmptyWorld,
         idsAt: idsAt,
-        killEveryoneAt: killEveryoneAt,
         moreThanIdAtXY: moreThanIdAtXY
     };
 
