@@ -1,4 +1,6 @@
-var enemies = (function () {
+"use strict";
+
+var entities = (function () {
     var i;
     var limit;
     var enemiesArray = [];
@@ -25,7 +27,6 @@ var enemies = (function () {
             } else {
                 enemiesArray[i].remove();
                 enemiesArray.splice(i, 1);
-
             }
         }
 

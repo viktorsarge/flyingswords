@@ -1,6 +1,6 @@
 "use strict";
 
-var placeObstacles = function (nr = 1, placeAtX = false, placeAtY = false, extraClass = false) {
+var placeObstacles = function (nr = 1, placeAtX = false, placeAtY = false) {
     var i = 0;
     var x;
     var y;
@@ -48,4 +48,9 @@ var placeObstacles = function (nr = 1, placeAtX = false, placeAtY = false, extra
 var resetObstacle = function () {
     this.classList.remove("dead");
 }; 
+
+// TODO: Break up into model and controller. 
+//        - register both enemies and obstacles in an array being updated by gameloop.
+//        - use reference to obstacle to add dead-class when other id's is at the same pos. 
+
 // TODO: Perhaps have obstacles animate only when player is near?

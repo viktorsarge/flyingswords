@@ -26,8 +26,8 @@ var defaults = (function () {
     var levels = [
         {
             killsRequired: 4,
-            clockSpeed: 1200,
-            numberOfObstacles: 1,
+            clockSpeed: 1000,
+            numberOfObstacles: 8,
             simultEnemies: 1
         },
         {

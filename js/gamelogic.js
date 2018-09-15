@@ -15,7 +15,7 @@ var game = (function() {
         worldmap.makeEmptyWorld();
         helper.createBoard();
         player.reset();
-        enemies.clear();
+        entities.clear();
         level = 0;
         score.reset();
         placeObstacles(defaults.levels[level]["numberOfObstacles"]);
@@ -28,7 +28,7 @@ var game = (function() {
     var switchPauseState = function () {
         if (pauseState) {
             pauseState = false;
-            clock = setInterval(enemies.update, defaults.levels[level].clockSpeed);
+            clock = setInterval(entities.update, defaults.levels[level].clockSpeed);
         } else {
             pauseState = true;
             clearInterval(clock);
