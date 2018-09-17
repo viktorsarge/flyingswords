@@ -28,7 +28,7 @@ var defaults = (function () {
             killsRequired: 4,
             clockSpeed: 1000,
             numberOfObstacles: 8,
-            simultEnemies: 1
+            simultEnemies: 4
         },
         {
             killsRequired: 5,

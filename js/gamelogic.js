@@ -18,7 +18,7 @@ var game = (function() {
         entities.clear();
         level = 0;
         score.reset();
-        placeObstacles(defaults.levels[level]["numberOfObstacles"]);
+        entities.generateObstacles(level);
     };
 
     var setupLevel = function () {
