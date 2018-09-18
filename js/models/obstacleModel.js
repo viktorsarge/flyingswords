@@ -1,7 +1,11 @@
 "use strict";
 
+var resetObstacle = function () {
+    this.classList.remove("dead");
+};
+
 var obstacleModel = function (x1 = false, y1 = false) {
-        var inCorner = function (x, y) {
+    var inCorner = function (x, y) {
         if ((x === defaults.xLimit || x === 0) && (y === 0 || y === defaults.yLimit)) {
             return true;
         } else {
@@ -19,7 +23,7 @@ var obstacleModel = function (x1 = false, y1 = false) {
         }
     };
 
-    if (x1 === false || y2 === false) {
+    if (x1 === false || y1 === false) {
         generatePos();
     }
     var x2 = x1;
@@ -87,12 +91,13 @@ var obstacleModel = function (x1 = false, y1 = false) {
         if (worldmap.moreThanIdAtXY(id, x2, y2)) {
             obstacleRef = document.getElementById(id);
             obstacleRef.classList.add("dead");
+            die();
         }
     };
 
     var plot = function () {
         if (x2 !== x1 || y2 !== y1) {
-            helper.plotObjectByPosAndType(x2, y2, type, id);  
+            helper.plotObjectByPosAndType(x2, y2, type, id);
             console.log("Obstacle seems to have moved - painting at new pos");
         }
         x1 = x2;
@@ -105,6 +110,8 @@ var obstacleModel = function (x1 = false, y1 = false) {
 
     var remove = function () {
         worldmap.removeIdAt(id, x1, y1);
+        helper.removeHTMLbyId(id);
+         console.log("ReMOvDED ObstACLAE");
     };
 
     var showId = function () {
@@ -120,8 +127,4 @@ var obstacleModel = function (x1 = false, y1 = false) {
         remove: remove,
         showId: showId
     };
-};
-
-var resetObstacle = function () {
-    this.classList.remove("dead");
 };
