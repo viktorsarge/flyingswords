@@ -1,6 +1,6 @@
 "use strict";
 
-var obstacle = function (x1 = false, y1 = false) {
+var obstacleModel = function (x1 = false, y1 = false) {
         var inCorner = function (x, y) {
         if ((x === defaults.xLimit || x === 0) && (y === 0 || y === defaults.yLimit)) {
             return true;
@@ -19,7 +19,7 @@ var obstacle = function (x1 = false, y1 = false) {
         }
     };
 
-    if (x1 === false || x2 === false) {
+    if (x1 === false || y2 === false) {
         generatePos();
     }
     var x2 = x1;
@@ -27,9 +27,13 @@ var obstacle = function (x1 = false, y1 = false) {
     var type = "obstacle";
     var id = idGenerator.generate(type);
     var alive = true;
+    var ref;
 
     helper.plotObjectByPosAndType(x2, y2, type, id);   // Initial plot
     worldmap.addIdAt(id, x2, y2);
+    ref = document.getElementById(id);
+    ref.addEventListener("webkitAnimationEnd", resetObstacle); // Chrome, Safari, opera
+    ref.addEventListener("animationend", resetObstacle);  // Standard syntax
 
 /*    var calculateDirection = function (playerPos, enemyPos) {
         var direction = 0;
@@ -49,11 +53,11 @@ var obstacle = function (x1 = false, y1 = false) {
     };
 
     var update = function () {
-        if (x2 != x1 || y2 != y1) {
+        if (x2 !== x1 || y2 !== y1) {
             helper.removeHTMLbyId(id);
             console.log("Obstacle seems to have moved - deleting");
         }
-        /*      
+        /*
         var playerpos = player.reportPosition();
         var directionX = calculateDirection(playerpos[0], x1);
         var directionY = calculateDirection(playerpos[1], y1);
@@ -87,7 +91,7 @@ var obstacle = function (x1 = false, y1 = false) {
     };
 
     var plot = function () {
-        if (x2 != x1 || y2 != y1) {
+        if (x2 !== x1 || y2 !== y1) {
             helper.plotObjectByPosAndType(x2, y2, type, id);  
             console.log("Obstacle seems to have moved - painting at new pos");
         }
@@ -116,4 +120,8 @@ var obstacle = function (x1 = false, y1 = false) {
         remove: remove,
         showId: showId
     };
+};
+
+var resetObstacle = function () {
+    this.classList.remove("dead");
 };

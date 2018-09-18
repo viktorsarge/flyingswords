@@ -1,6 +1,6 @@
 "use strict";
 
-var enemy = function () {
+var enemyModel = function () {
     var position = helper.getNextCornerXY();
     var x1 = position[0];
     var y1 = position[1];
@@ -26,6 +26,7 @@ var enemy = function () {
     var die = function () {
         game.score.add();
         alive = false;
+        entitiesController.oneLessEnemy();  // TODO: Let the controller handle this logic instead
     };
 
     var update = function () {
@@ -46,7 +47,7 @@ var enemy = function () {
             game.restart();
         } else if (worldmap.moreThanIdAtXY(id, x2, y2)) {
             if (!helper.typeAtXY("obstacle", x2, y2)) {
-                obstacleId = entities.singleObstacle(x2, y2);   // TODO
+                obstacleId = entitiesController.singleObstacle(x2, y2);
                 obstacleRef = document.getElementById(obstacleId);
                 obstacleRef.classList.add("dead");
             }
@@ -65,7 +66,7 @@ var enemy = function () {
     };
 
     var remove = function () {
-        worldmap.removeIdAt(id, x1, y1);
+        worldmap.removeIdAt(id, x2, y2);
     };
 
     return {

@@ -1,6 +1,6 @@
 "use strict";
 
-var entities = (function () {
+var entitiesController = (function () {
     var i;
     var limit;
     var enemiesArray = [];
@@ -10,19 +10,19 @@ var entities = (function () {
 
     var setupLevel = function (levelNr) {
         enemiesArray = [];
+        nrOfEnemies = 0;
         console.log("setupLevel in entities has triggered");
         // TODO - convert to a for loop instead
         while (nrOfEnemies < defaults.levels[levelNr].simultEnemies) {
-            entity = enemy();
+            entity = enemyModel();
             enemiesArray.push(entity);
             nrOfEnemies += 1;
             console.log("In while loop of setupLevel");
         }
-        //generateObstacles(levelNr);
     };
 
     var singleObstacle = function (x, y) {
-        entity = obstacle(x, y);
+        entity = obstacleModel(x, y);
         enemiesArray.push(entity);
         console.log("Single obstacle id:");
         console.log(entity.showId());
@@ -32,7 +32,7 @@ var entities = (function () {
     var generateObstacles = function (levelNr) {
         var i;
         for (i = 0; i < defaults.levels[0].numberOfObstacles; i += 1) {
-            entity = obstacle();
+            entity = obstacleModel();
             enemiesArray.push(entity);
             entity.plot();
         }
@@ -54,26 +54,29 @@ var entities = (function () {
             }
         }
 
-        // TODO - adapt to use nrOfEnemies instead. 
-        // Add enemies if there are room for them
-        while (nrOfEnemies < defaults.levels[0].simultEnemies) {
-            // TODO: Initialize the correct nr of simult. enemies for the level
-            entity = enemy();
+        // Add one new enemy per tick if there is room for it
+        if (nrOfEnemies < defaults.levels[0].simultEnemies) {
+            entity = enemyModel();
             enemiesArray.push(entity);
             entity.plot();
-            console.log("in while loop to add enemies");
             nrOfEnemies += 1;
         }
     };
 
     var clear = function () {
         enemiesArray = [];
+        nrOfEnemies = 0;
+    };
+
+    var oneLessEnemy = function () {
+        nrOfEnemies -= 1;
     };
 
     return {
         update: update,
         clear: clear,
         generateObstacles: generateObstacles,
-        singleObstacle: singleObstacle
+        singleObstacle: singleObstacle,
+        oneLessEnemy: oneLessEnemy
     };
 }());

@@ -35,9 +35,7 @@ var placeObstacles = function (nr = 1, placeAtX = false, placeAtY = false) {
         id = idGenerator.generate(type);
         worldmap.addIdAt(id, x, y);
         helper.plotObjectByPosAndType(x, y, type, id);
-        ref = document.getElementById(id);
-        ref.addEventListener("webkitAnimationEnd", resetObstacle); // Chrome, Safari, opera
-        ref.addEventListener("animationend", resetObstacle);  // Standard syntax
+
         i += 1;
     }
     if (nr === 1) {

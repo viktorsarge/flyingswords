@@ -2,8 +2,8 @@
 
 var helper = helpers();
 
-// TODO - collisionrules should be it's own controller since it's specific for each game.
-//        possibly it could be in defaults. 
+// TODO - collisionrules could possibly move to it's own logic or defaults.
+//        possibly it could be in defaults.
 
 // Game is self invoking, but does a restart at the bottom as a form of init.
 var game = (function() {
@@ -11,14 +11,32 @@ var game = (function() {
     var level = 0;
     var clock = "";
 
+    var score = (function () {
+        var points = 0;
+        var cell = document.getElementById("score");
+        cell.innerHTML = points;
+        var add = function () {
+            points += 1;
+            cell.innerHTML = points;
+        };
+        var reset = function () {
+            points = 0;
+            cell.innerHTML = points;
+        };
+        return {
+            add: add,
+            reset: reset
+        };
+    }());
+
     var restart = function () {
         worldmap.makeEmptyWorld();
         helper.createBoard();
         player.reset();
-        entities.clear();
+        entitiesController.clear();
         level = 0;
         score.reset();
-        entities.generateObstacles(level);
+        entitiesController.generateObstacles(level);
     };
 
     var setupLevel = function () {
@@ -28,7 +46,7 @@ var game = (function() {
     var switchPauseState = function () {
         if (pauseState) {
             pauseState = false;
-            clock = setInterval(entities.update, defaults.levels[level].clockSpeed);
+            clock = setInterval(entitiesController.update, defaults.levels[level].clockSpeed);
         } else {
             pauseState = true;
             clearInterval(clock);
@@ -48,24 +66,6 @@ var game = (function() {
     var isPaused = function() {
         return pauseState;
     };
-
-    var score = (function () {
-        var points = 0;
-        var cell = document.getElementById("score");
-        cell.innerHTML = points;
-        var add = function () {
-            points += 1;
-            cell.innerHTML = points;
-        };
-        var reset = function () {
-            points = 0;
-            cell.innerHTML = points;
-        };
-        return {
-            add: add,
-            reset: reset
-        };
-    }());
 
     return {
         start: start,

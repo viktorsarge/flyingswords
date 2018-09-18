@@ -31,6 +31,7 @@ var worldmap = (function () {
     };
 
     var moreThanIdAtXY = function (id, x, y) {
+        // TODO: rename to "more than one at xy" or check that id is at xy
         var alone;
         var arr = worldarray[y][x];
         if (arr.length > 1) {
@@ -39,12 +40,11 @@ var worldmap = (function () {
             alone = true;
         }
 
-        if (alone) { 
+        if (alone) {
             return false;
         } else {
             return true;
-        } 
-
+        }
     };
 
     // Moves the id of a game object in the world array
@@ -67,7 +67,7 @@ var worldmap = (function () {
             } else {
                 // Remove from the old position if found
                 if (index > -1) {
-                    worldarray[y1][x1].splice(index);;
+                    worldarray[y1][x1].splice(index);
                 }
                 // Add to the right at the new position
                 worldarray[y2][x2].push(id);
