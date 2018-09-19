@@ -111,7 +111,7 @@ var obstacleModel = function (x1 = false, y1 = false) {
     var remove = function () {
         worldmap.removeIdAt(id, x1, y1);
         helper.removeHTMLbyId(id);
-         console.log("ReMOvDED ObstACLAE");
+        console.log("ReMOvDED ObstACLAE");
     };
 
     var showId = function () {
