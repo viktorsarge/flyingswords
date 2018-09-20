@@ -13,6 +13,7 @@ var player = (function () {
     var id = idGenerator.generate(type);
 
     var move = function (direction) {
+        var cellRef;
         if (!game.isPaused()) {
             switch (direction) {
             case "up":
@@ -20,6 +21,10 @@ var player = (function () {
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
                         helper.removeHTMLbyId(id);
+                        cellRef = document.getElementById("x" + x1 + "y" + y1);
+                        cellRef.addEventListener("webkitAnimationEnd", removePlayertrailClass); // Chrome, Safari, opera
+                        cellRef.addEventListener("animationend", removePlayertrailClass);  // Standard syntax
+                        helper.addFadingBackground(x1, y1, type);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         y1 = y2;
                     } else {
@@ -37,6 +42,10 @@ var player = (function () {
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
                         helper.removeHTMLbyId(id);
+                        cellRef = document.getElementById("x" + x1 + "y" + y1);
+                        cellRef.addEventListener("webkitAnimationEnd", removePlayertrailClass); // Chrome, Safari, opera
+                        cellRef.addEventListener("animationend", removePlayertrailClass);  // Standard syntax
+                        helper.addFadingBackground(x1, y1, type);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         y1 = y2;
                     } else {
@@ -53,6 +62,10 @@ var player = (function () {
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
                         helper.removeHTMLbyId(id);
+                        cellRef = document.getElementById("x" + x1 + "y" + y1);
+                        cellRef.addEventListener("webkitAnimationEnd", removePlayertrailClass); // Chrome, Safari, opera
+                        cellRef.addEventListener("animationend", removePlayertrailClass);  // Standard syntax
+                        helper.addFadingBackground(x1, y1, type);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         x1 = x2;
                     } else {
@@ -69,6 +82,10 @@ var player = (function () {
                 if (worldmap.isEmptyPos(x2, y2)) {
                     if (worldmap.moveIdFromTo(id, x1, y1, x2, y2)) {
                         helper.removeHTMLbyId(id);
+                        cellRef = document.getElementById("x" + x1 + "y" + y1);
+                        cellRef.addEventListener("webkitAnimationEnd", removePlayertrailClass); // Chrome, Safari, opera
+                        cellRef.addEventListener("animationend", removePlayertrailClass);  // Standard syntax
+                        helper.addFadingBackground(x1, y1, type);
                         helper.plotObjectByPosAndType(x2, y2, type, id);
                         x1 = x2;
                     } else {

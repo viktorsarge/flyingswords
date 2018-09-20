@@ -1,5 +1,9 @@
 "use strict";
 
+var removePlayertrailClass = function () {
+    this.classList.remove("playertrail");
+};
+
 var idGenerator = (function() {
     var i = 0;
     var entities = {};
@@ -105,6 +109,14 @@ var helpers = function () {
         }
     };
 
+    var addFadingBackground = function (x, y, type) {
+        var idOfCell = "x" + x + "y" + y;
+        console.log(idOfCell);
+        var cellRef = document.getElementById(idOfCell);
+        cellRef.classList.add("playertrail");
+
+    };
+
 
     return {
         createBoard: createBoard,
@@ -112,6 +124,7 @@ var helpers = function () {
         plotObjectByPosAndType: plotObjectByPosAndType,
         randomIntFromInterval: randomIntFromInterval,
         getNextCornerXY: putBabyInACorner,
-        typeAtXY: typeAtXY
+        typeAtXY: typeAtXY,
+        addFadingBackground: addFadingBackground
     };
 };

@@ -90,7 +90,24 @@ td {
     animation-duration: 8s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-}    
+}
+
+.playertrail {
+    animation-name: playertrail;
+    animation-duration: 0.8s;
+    animation-iteration-count: 1;
+    animation-timing-function: linear;
+}
+
+@keyframes playertrail {
+    0%  {
+            background-color: #44B3C2;
+        }
+
+    100%    {
+                background-color: #F2EDD8;
+            }
+}
 
 @keyframes rotatingForever {
     0%    {
