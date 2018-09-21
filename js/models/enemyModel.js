@@ -30,6 +30,7 @@ var enemyModel = function () {
     };
 
     var update = function () {
+        var cellRef;
         helper.removeHTMLbyId(id);
         var playerpos = player.reportPosition();
         var directionX = calculateDirection(playerpos[0], x1);
@@ -37,6 +38,10 @@ var enemyModel = function () {
         x2 = x1 + directionX;
         y2 = y1 + directionY;
         worldmap.moveIdFromTo(id, x1, y1, x2, y2);
+        cellRef = document.getElementById("x" + x1 + "y" + y1);
+        cellRef.addEventListener("webkitAnimationEnd", removeEnemyTrailClass); // Chrome, Safari, opera
+        cellRef.addEventListener("animationend", removeEnemyTrailClass);  // Standard syntax
+        helper.addFadingBackground(x1, y1, type);
     };
 
     var collisionCheck = function () {

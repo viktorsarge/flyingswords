@@ -90,7 +90,6 @@ var obstacleModel = function (x1 = false, y1 = false) {
         */
         if (worldmap.moreThanIdAtXY(id, x2, y2)) {
             obstacleRef = document.getElementById(id);
-            obstacleRef.classList.add("dead");
             die();
         }
     };
@@ -109,8 +108,12 @@ var obstacleModel = function (x1 = false, y1 = false) {
     };
 
     var remove = function () {
+        var cellRef = document.getElementById("x" + x1 + "y" + y1);
         worldmap.removeIdAt(id, x1, y1);
         helper.removeHTMLbyId(id);
+        cellRef.addEventListener("webkitAnimationEnd", removeDeathFadeClass); // Chrome, Safari, opera
+        cellRef.addEventListener("animationend", removeDeathFadeClass);  // Standard syntax
+        cellRef.classList.add("deathFade");
         console.log("ReMOvDED ObstACLAE");
     };
 

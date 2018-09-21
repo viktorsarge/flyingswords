@@ -71,6 +71,7 @@ td {
     color: #E45641;
     height: 100%;
     padding-top: 0.2em;
+    border-radius: 1em;
 }
 
 .noanimation {
@@ -85,6 +86,13 @@ td {
     animation-direction: normal;    
 }
 
+.deathFade {
+    animation-name: deathFade;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-direction: normal;    
+}
+
 .rotating {
     animation-name: rotatingForever;
     animation-duration: 8s;
@@ -94,9 +102,36 @@ td {
 
 .playertrail {
     animation-name: playertrail;
-    animation-duration: 0.8s;
+    animation-duration: 0.5s;
     animation-iteration-count: 1;
     animation-timing-function: linear;
+}
+
+.enemyTrail {
+    animation-name: enemyTrail;
+    animation-duration: 0.2s;
+    animation-iteration-count: 1;
+    animation-timing-function: linear;
+}
+
+@keyframes deathFade {
+    0%  {
+            background-color:  #E45641;
+        }
+
+    100%    {
+                background-color: #F2EDD8;
+            }
+}
+
+@keyframes enemyTrail {
+    0%  {
+            background-color:  #5D4C46;
+        }
+
+    100%    {
+                background-color: #F2EDD8;
+            }
 }
 
 @keyframes playertrail {

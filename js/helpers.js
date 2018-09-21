@@ -4,6 +4,15 @@ var removePlayertrailClass = function () {
     this.classList.remove("playertrail");
 };
 
+var removeEnemyTrailClass = function () {
+    this.classList.remove("enemyTrail");
+};
+
+var removeDeathFadeClass = function () {
+    this.classList.remove("deathFade");
+};
+
+
 var idGenerator = (function() {
     var i = 0;
     var entities = {};
@@ -113,7 +122,11 @@ var helpers = function () {
         var idOfCell = "x" + x + "y" + y;
         console.log(idOfCell);
         var cellRef = document.getElementById(idOfCell);
-        cellRef.classList.add("playertrail");
+        if (type === "player") {
+            cellRef.classList.add("playertrail");
+        } else if (type === "enemy") {
+            cellRef.classList.add("enemyTrail");
+        }
 
     };
 
