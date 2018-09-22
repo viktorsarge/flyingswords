@@ -30,7 +30,6 @@ var entitiesController = (function () {
     };
 
     var generateObstacles = function (levelNr) {
-        var i;
         for (i = 0; i < defaults.levels[0].numberOfObstacles; i += 1) {
             entity = obstacleModel();
             enemiesArray.push(entity);

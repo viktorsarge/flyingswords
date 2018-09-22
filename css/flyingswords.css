@@ -67,6 +67,7 @@ td {
     background-color: #F1A94E;
     color: #E45641;
     */
+    position: relative;
     background-color: #5D4C46;
     color: #E45641;
     height: 100%;
@@ -114,6 +115,39 @@ td {
     animation-timing-function: linear;
 }
 
+.moveN {
+    animation-name: moveN;
+    animation-duration: 0.3s;
+    animation-iteration-count: 1;
+    animation-timing-function: linear;   
+}
+
+@keyframes moveN {
+    0%  {
+            top: 0%;    
+        }
+
+    100%    {
+                top: -100%;   
+            }
+}
+
+.moveE {
+    animation-name: moveE;
+    animation-duration: 0.3s;
+    animation-iteration-count: 1;
+    animation-timing-function: linear;   
+}
+
+@keyframes moveE {
+    0%  {
+            left: 0%;    
+        }
+
+    100%    {
+                left: 100%;   
+            }
+}
 @keyframes deathFade {
     0%  {
             background-color:  #E45641;

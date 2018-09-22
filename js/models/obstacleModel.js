@@ -72,7 +72,6 @@ var obstacleModel = function (x1 = false, y1 = false) {
     };
 
     var collisionCheck = function () {
-        var obstacleRef;
         /*
         var obstacleId;
         var obstacleRef;
@@ -89,7 +88,6 @@ var obstacleModel = function (x1 = false, y1 = false) {
         }
         */
         if (worldmap.moreThanIdAtXY(id, x2, y2)) {
-            obstacleRef = document.getElementById(id);
             die();
         }
     };
