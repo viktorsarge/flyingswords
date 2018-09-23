@@ -11,6 +11,7 @@ var player = (function () {
     var y2 = y1;
     var type = "player";
     var id = idGenerator.generate(type);
+    var life = 1;
 
     var move = function (direction) {
         var cellRef;
@@ -114,9 +115,17 @@ var player = (function () {
         return [x2, y2];
     };
 
+    var takeDamadge = function () {
+        life -= 1;
+        if (life < 1) {
+            game.restart();
+        }
+    };
+
     return {
         move: move,
         reset: reset,
-        reportPosition: reportPosition
+        reportPosition: reportPosition,
+        takeDamadge: takeDamadge
     };
 }());

@@ -49,7 +49,8 @@ var enemyModel = function () {
         var obstacleRef;
         // Restart if hit the player
         if (x2 === player.reportPosition()[0] && y2 === player.reportPosition()[1]) {
-            game.restart();
+            player.takeDamadge();
+            die();
         } else if (worldmap.moreThanIdAtXY(id, x2, y2)) {
             if (!helper.typeAtXY("obstacle", x2, y2)) {
                 obstacleId = entitiesController.singleObstacle(x2, y2);
