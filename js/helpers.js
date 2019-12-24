@@ -12,6 +12,10 @@ var removeDeathFadeClass = function () {
     this.classList.remove("deathFade");
 };
 
+var removeDamadgeClass = function () {
+    this.classList.remove("damadge");
+};
+
 /*
 var removeClass = function(classname, x, y) {
     var cellRef = document.getElementById("x" + x + "y" + y);

@@ -11,7 +11,9 @@ var player = (function () {
     var y2 = y1;
     var type = "player";
     var id = idGenerator.generate(type);
-    var life = 1;
+    var life = 4;
+    var shieldDisplay = document.getElementById("shield");
+    shieldDisplay.innerHTML = life - 1;
 
     var move = function (direction) {
         var cellRef;
@@ -33,9 +35,9 @@ var player = (function () {
                     }
                 } else {
                     console.log("KILL!");
-                    game.restart();
+                    takeDamadge();
+                    // TODO - kill the object that was collided? 
                 }
-
                 break;
 
             case "down":
@@ -54,7 +56,8 @@ var player = (function () {
                     }
                 } else {
                     console.log("KILL!");
-                    game.restart();
+                    takeDamadge();
+                    // TODO - kill the object that was collided? 
                 }
                 break;
 
@@ -74,7 +77,8 @@ var player = (function () {
                     }
                 } else {
                     console.log("KILL!");
-                    game.restart();
+                    takeDamadge();
+                    // TODO - kill the object that was collided? 
                 }
                 break;
 
@@ -94,7 +98,8 @@ var player = (function () {
                     }
                 } else {
                     console.log("KILL!");
-                    game.restart();
+                    takeDamadge();
+                    // TODO - kill the object that was collided? 
                 }
                 break;
             }
@@ -109,6 +114,8 @@ var player = (function () {
         y2 = y1;
         worldmap.addIdAt(id, x1, y1);
         helper.plotObjectByPosAndType(x2, y2, type, id);
+        life = 4;
+        shieldDisplay.innerHTML = life - 1;
     };
 
     var reportPosition = function () {
@@ -116,7 +123,14 @@ var player = (function () {
     };
 
     var takeDamadge = function () {
+        var playerRef;
         life -= 1;
+        shieldDisplay.innerHTML = life - 1;
+        playerRef = document.getElementById(id);
+        playerRef.addEventListener("webkitAnimationEnd", removeDamadgeClass); // Chrome, Safari, opera
+        playerRef.addEventListener("animationend", removeDamadgeClass );  // Standard syntax
+        playerRef.classList.add("damadge");
+
         if (life < 1) {
             game.restart();
         }

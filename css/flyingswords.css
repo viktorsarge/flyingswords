@@ -139,6 +139,23 @@ td {
     animation-timing-function: linear;   
 }
 
+.damadge {
+    animation-name: damadge;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-timing-function: linear;  
+}
+
+@keyframes damadge {
+    0%    {
+             transform: rotate(0deg)
+          }
+
+    100%  {
+              transform: rotate(360deg)
+          }
+}
+
 @keyframes moveE {
     0%  {
             left: 0%;    
